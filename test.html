@@ -8,19 +8,19 @@
 <body>
 <style>
   :root {
-    --ink: #132029;
-    --ink-soft: #1d2f3a;
-    --paper: #f5f8f7;
+    --ink: #0b1f47;
+    --ink-soft: #16305f;
+    --paper: #eef4ff;
     --card: #ffffff;
-    --border: #dbe4e0;
-    --text: #1a2a30;
-    --muted: #5d7078;
-    --teal: #0e7c7b;
-    --teal-dark: #0a5f5e;
-    --A: #38a169;
-    --T: #e4572e;
-    --G: #e0a422;
-    --C: #2e7dd2;
+    --border: #d3e0f5;
+    --text: #16233d;
+    --muted: #5a6b8c;
+    --teal: #2563eb;
+    --teal-dark: #1d4ed8;
+    --A: #22c55e;
+    --T: #f43f5e;
+    --G: #f59e0b;
+    --C: #38bdf8;
     --good-bg: #e6f4ec;
     --good-line: #38a169;
     --bad-bg: #fcece7;
@@ -47,12 +47,12 @@
   /* ---- Header ---- */
   header {
     position: relative;
-    background: var(--ink);
+    background: linear-gradient(135deg, #0b1f47 0%, #1e3a8a 55%, #2563eb 100%);
     color: #eef4f2;
     overflow: hidden;
-    border-bottom: 3px solid var(--teal);
+    border-bottom: 3px solid #38bdf8;
   }
-  #helix { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .55; }
+  #helix { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .6; }
   .head-inner {
     position: relative;
     max-width: 900px;
@@ -65,7 +65,7 @@
     font-size: 12px;
     letter-spacing: .12em;
     text-transform: uppercase;
-    color: #9fdad4;
+    color: #a9c7ff;
     text-decoration: none;
     margin-bottom: 18px;
     transition: color .15s;
@@ -77,7 +77,7 @@
     font-size: 12px;
     letter-spacing: .22em;
     text-transform: uppercase;
-    color: #7fd6cf;
+    color: #7fb3ff;
     margin: 0 0 10px;
   }
   header h1 { font-size: clamp(30px, 5vw, 46px); line-height: 1.05; color: #fff; }
@@ -127,7 +127,7 @@
   .titlebar input:focus { outline: none; border-bottom-color: var(--teal); }
   .count-pill {
     font-family: var(--mono); font-size: 12px; color: var(--teal-dark);
-    background: #e0f0ef; border: 1px solid #bfe0dd; padding: 4px 10px; border-radius: 999px;
+    background: #e2ecff; border: 1px solid #bcd3ff; padding: 4px 10px; border-radius: 999px;
     white-space: nowrap;
   }
 
@@ -176,14 +176,14 @@
   .radio-hint { font-size: 12px; color: var(--muted); margin: 0 0 14px; padding-left: 68px; }
   .btn {
     background: var(--teal); color: #fff; border: 0; border-radius: 10px;
-    padding: 11px 20px; font-size: 15px; font-weight: 600; box-shadow: 0 2px 6px rgba(14,124,123,.25);
+    padding: 11px 20px; font-size: 15px; font-weight: 600; box-shadow: 0 2px 6px rgba(37,99,235,.28);
     transition: background .16s, transform .08s;
   }
   .btn:hover { background: var(--teal-dark); }
   .btn:active { transform: translateY(1px); }
   .btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
   .btn.ghost { background: transparent; color: var(--teal-dark); border: 1px solid var(--teal); box-shadow: none; }
-  .btn.ghost:hover { background: #e0f0ef; }
+  .btn.ghost:hover { background: #e2ecff; }
   .form-actions { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
 
   /* ---- Take mode ---- */
@@ -193,9 +193,9 @@
     border: 1px solid var(--border); border-radius: 9px; cursor: pointer; background: #fbfdfc;
     font-size: 15px; transition: border-color .14s, background .14s;
   }
-  .take-opts label:hover { border-color: var(--teal); background: #f2faf9; }
+  .take-opts label:hover { border-color: var(--teal); background: #f0f5ff; }
   .take-opts input { accent-color: var(--teal); width: 17px; height: 17px; }
-  .take-opts label.pick { border-color: var(--teal); background: #eaf6f5; }
+  .take-opts label.pick { border-color: var(--teal); background: #e2ecff; }
   .take-opts label.reveal-correct { background: var(--good-bg); border-color: var(--good-line); }
   .take-opts label.reveal-wrong { background: var(--bad-bg); border-color: var(--bad-line); }
   .verdict { font-family: var(--mono); font-size: 12px; font-weight: 700; margin-left: auto; }
@@ -556,7 +556,7 @@
   var canvas = document.getElementById("helix");
   var ctx = canvas.getContext("2d");
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var pairColors = [["#38a169", "#e4572e"], ["#e0a422", "#2e7dd2"]]; // A-T, G-C
+  var pairColors = [["#22c55e", "#f43f5e"], ["#f59e0b", "#38bdf8"]]; // A-T, G-C
   var W, H, dpr;
   function resize() {
     dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -581,7 +581,7 @@
       var depth = (Math.cos(a) + 1) / 2; // 0..1 for pseudo-3D fade
       var pc = pairColors[i % 2];
       ctx.globalAlpha = 0.25 + depth * 0.5;
-      ctx.strokeStyle = "#7fd6cf";
+      ctx.strokeStyle = "#7fb3ff";
       ctx.lineWidth = 1.4;
       ctx.beginPath(); ctx.moveTo(x, y1); ctx.lineTo(x, y2); ctx.stroke();
       // nodes
