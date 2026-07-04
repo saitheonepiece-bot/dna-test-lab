@@ -1,17 +1,24 @@
-# The Double Helix Test Lab
+# ⚡ Spark Science Lab
 
-A single-file web app to **build a biology DNA quiz and take it** — no server, no build step, no login.
+A single-file web app of **science quizzes for grades 6–9** — no server, no build step, no login.
 
 ## Run it
 
-Just open `index.html` in any web browser (double-click it, or drag it into a browser tab).
+Open `index.html` in any web browser (double-click it, or drag it into a browser tab).
 
-## Features
+## What's inside
 
-- **Build mode** — add multiple-choice questions and mark the correct answer
-- **Take mode** — answer, submit, and get an instant score with per-question review
-- Comes preloaded with 8 DNA questions (structure, replication, base pairing)
-- Saves your test to the browser automatically (localStorage)
-- Animated double-helix header
+- **Three subjects:** 🧬 Biology · ⚗️ Chemistry · 🔭 Physics
+- **A separate test for each grade, 6 through 9** — 12 ready-made quizzes in total
+- **Take mode** — answer, submit, and get an instant score with a right/wrong review
+- **Build mode** — add, edit, or delete your own questions for any test
+- Switch subject and grade any time from inside the test
+- Your changes save to the browser automatically (localStorage)
 
-Everything lives in `index.html` — HTML, CSS, and JavaScript in one file.
+## Files
+
+- `index.html` — home page with the subject × grade picker
+- `test.html` — the quiz engine (reads `?subject=...&grade=...`)
+- `.nojekyll` — tells GitHub Pages to serve the files as-is
+
+Live site: https://saitheonepiece-bot.github.io/dna-test-lab/

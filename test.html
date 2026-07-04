@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Double Helix Test Lab</title>
+<title>Spark Science Lab — Take a Test</title>
 </head>
 <body>
 <style>
@@ -230,20 +230,32 @@
     .q-opts, .take-opts { padding-left: 0; }
     .radio-hint { padding-left: 0; }
   }
+
+  /* ---- Subject / grade switcher ---- */
+  .switcher { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 22px; }
+  .switcher label { display: inline-flex; flex-direction: column; gap: 5px; font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #cfe0fb; }
+  .switcher select {
+    font-family: var(--sans); font-size: 15px; font-weight: 600; color: #0b1f47;
+    background: #fff; border: 0; border-radius: 10px; padding: 9px 14px; cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0,0,0,.18); min-width: 150px;
+  }
+  .switcher select:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
 </style>
 
 <header>
   <canvas id="helix" aria-hidden="true"></canvas>
   <div class="head-inner">
-    <a class="home-link" href="index.html">&larr; Home</a>
-    <p class="eyebrow">Molecular Biology · Assessment Builder</p>
-    <h1>The Double Helix Test Lab</h1>
-    <p class="sub">Build a biology quiz on DNA — structure, replication, and the genetic code — then take it and get scored instantly.</p>
-    <div class="legend" aria-hidden="true">
-      <span><i class="dot" style="background:var(--A)"></i>Adenine</span>
-      <span><i class="dot" style="background:var(--T)"></i>Thymine</span>
-      <span><i class="dot" style="background:var(--G)"></i>Guanine</span>
-      <span><i class="dot" style="background:var(--C)"></i>Cytosine</span>
+    <a class="home-link" href="index.html">&larr; All tests</a>
+    <p class="eyebrow" id="eyebrow">Spark Science Lab</p>
+    <h1 id="head-title">Science Test</h1>
+    <p class="sub" id="head-sub">Take the test or build your own, then get scored instantly.</p>
+    <div class="switcher">
+      <label>Subject
+        <select id="sel-subject" aria-label="Choose subject"></select>
+      </label>
+      <label>Grade
+        <select id="sel-grade" aria-label="Choose grade"></select>
+      </label>
     </div>
   </div>
 </header>
@@ -287,43 +299,186 @@
 </main>
 
 <footer>
-  <span class="A">A</span><span class="T">T</span><span class="G">G</span><span class="C">C</span> · saved to this browser
+  Spark Science Lab · your test is saved in this browser
 </footer>
 
 <script>
 (function () {
   "use strict";
   var LETTERS = ["A", "B", "C", "D"];
-  var KEY = "dna-test-lab-v1";
+  var KEY = "";
+  var state;
+  var currentSubject, currentGrade, currentTab = "build";
 
-  var seed = {
-    title: "DNA: Structure & Replication",
-    questions: [
-      { q: "Which nitrogenous base pairs with adenine in DNA?", options: ["Thymine", "Guanine", "Cytosine", "Uracil"], correct: 0 },
-      { q: "What type of bond holds the two strands of the DNA double helix together?", options: ["Peptide bonds", "Hydrogen bonds", "Ionic bonds", "Disulfide bonds"], correct: 1 },
-      { q: "The sugar found in the backbone of a DNA molecule is:", options: ["Ribose", "Glucose", "Deoxyribose", "Fructose"], correct: 2 },
-      { q: "DNA replication is described as semi-conservative because each new molecule contains:", options: ["Two brand-new strands", "One original and one new strand", "Only original strands", "Fragments from many molecules"], correct: 1 },
-      { q: "Which enzyme adds new nucleotides to a growing DNA strand?", options: ["Helicase", "Ligase", "DNA polymerase", "Primase"], correct: 2 },
-      { q: "How many hydrogen bonds form between guanine and cytosine?", options: ["One", "Two", "Three", "Four"], correct: 2 },
-      { q: "The two strands of DNA are described as antiparallel, meaning they run:", options: ["In the same 5' to 3' direction", "In opposite directions", "Perpendicular to each other", "In a random orientation"], correct: 1 },
-      { q: "A nucleotide is made of a phosphate group, a nitrogenous base, and a:", options: ["Fatty acid", "Amino acid", "Sugar", "Ribosome"], correct: 2 }
-    ]
+  var SUBJECTS = {
+    biology:   { name: "Biology",   emoji: "🧬", accent: "#22c55e", dark: "#15803d", grad: "linear-gradient(135deg,#064e3b 0%,#15803d 55%,#22c55e 100%)", blurb: "cells, the human body, ecosystems and DNA" },
+    chemistry: { name: "Chemistry", emoji: "⚗️", accent: "#a855f7", dark: "#7c3aed", grad: "linear-gradient(135deg,#3b0764 0%,#7c3aed 55%,#a855f7 100%)", blurb: "matter, atoms, the periodic table and reactions" },
+    physics:   { name: "Physics",   emoji: "🔭", accent: "#3b82f6", dark: "#2563eb", grad: "linear-gradient(135deg,#0a1a3f 0%,#1e3a8a 55%,#2563eb 100%)", blurb: "forces, energy, motion, electricity and waves" }
+  };
+  var GRADES = [6, 7, 8, 9];
+
+  var BANK = {
+    biology: {
+      6: [
+        { q: "What is the basic building block of all living things?", options: ["Atom", "Cell", "Molecule", "Organ"], correct: 1 },
+        { q: "Which part of a plant cell captures sunlight to make food?", options: ["Root", "Chloroplast", "Stem", "Petal"], correct: 1 },
+        { q: "Living things that make their own food are called:", options: ["Consumers", "Producers", "Decomposers", "Predators"], correct: 1 },
+        { q: "Which organ pumps blood around your body?", options: ["Lungs", "Brain", "Heart", "Liver"], correct: 2 },
+        { q: "Animals that eat only plants are called:", options: ["Carnivores", "Omnivores", "Herbivores", "Decomposers"], correct: 2 },
+        { q: "The process plants use to make food from sunlight is:", options: ["Respiration", "Digestion", "Photosynthesis", "Evaporation"], correct: 2 }
+      ],
+      7: [
+        { q: "Which body system is responsible for breathing?", options: ["Digestive system", "Respiratory system", "Nervous system", "Skeletal system"], correct: 1 },
+        { q: "The tiny structures inside a cell that each do a special job are called:", options: ["Tissues", "Organelles", "Organs", "Molecules"], correct: 1 },
+        { q: "Which blood cells help fight infection?", options: ["Red blood cells", "White blood cells", "Platelets", "Plasma"], correct: 1 },
+        { q: "Animals that have a backbone are called:", options: ["Invertebrates", "Vertebrates", "Arthropods", "Mollusks"], correct: 1 },
+        { q: "Which part of the cell is the 'control centre'?", options: ["Cytoplasm", "Cell membrane", "Nucleus", "Vacuole"], correct: 2 },
+        { q: "In a leaf cell, photosynthesis mainly happens in the:", options: ["Mitochondria", "Nucleus", "Chloroplast", "Ribosome"], correct: 2 }
+      ],
+      8: [
+        { q: "Which molecule carries the genetic instructions in living things?", options: ["Protein", "DNA", "Glucose", "Water"], correct: 1 },
+        { q: "The 'powerhouse of the cell' that releases energy is the:", options: ["Nucleus", "Ribosome", "Mitochondria", "Chloroplast"], correct: 2 },
+        { q: "Organisms that break down dead material in an ecosystem are:", options: ["Producers", "Consumers", "Decomposers", "Predators"], correct: 2 },
+        { q: "Cell division that produces two identical cells is called:", options: ["Meiosis", "Mitosis", "Fertilisation", "Digestion"], correct: 1 },
+        { q: "In DNA, which base pairs with adenine?", options: ["Guanine", "Cytosine", "Thymine", "Uracil"], correct: 2 },
+        { q: "A group of the same species living in one area is a:", options: ["Community", "Ecosystem", "Population", "Habitat"], correct: 2 }
+      ],
+      9: [
+        { q: "What is the shape of a DNA molecule?", options: ["Single strand", "Double helix", "Flat sheet", "Triangle"], correct: 1 },
+        { q: "'Semi-conservative' replication means each new DNA molecule has:", options: ["Two brand-new strands", "One old and one new strand", "Only old strands", "Random fragments"], correct: 1 },
+        { q: "Which enzyme builds a new DNA strand?", options: ["Helicase", "Ligase", "DNA polymerase", "Amylase"], correct: 2 },
+        { q: "Proteins are made at which structure in the cell?", options: ["Nucleus", "Ribosome", "Vacuole", "Golgi body"], correct: 1 },
+        { q: "A section of DNA that codes for one protein is called a:", options: ["Chromosome", "Gene", "Nucleotide", "Cell"], correct: 1 },
+        { q: "In DNA, guanine always pairs with:", options: ["Adenine", "Thymine", "Cytosine", "Uracil"], correct: 2 }
+      ]
+    },
+    chemistry: {
+      6: [
+        { q: "What are the three common states of matter?", options: ["Solid, liquid, gas", "Hot, warm, cold", "Big, medium, small", "Hard, soft, runny"], correct: 0 },
+        { q: "When a solid turns into a liquid, the process is called:", options: ["Freezing", "Melting", "Boiling", "Condensing"], correct: 1 },
+        { q: "Which state of matter has a fixed shape and a fixed volume?", options: ["Gas", "Liquid", "Solid", "Plasma"], correct: 2 },
+        { q: "Water turning into steam is an example of:", options: ["Melting", "Freezing", "Evaporation", "Condensation"], correct: 2 },
+        { q: "The smallest particle of an element is the:", options: ["Cell", "Atom", "Grain", "Drop"], correct: 1 },
+        { q: "A mixture of sand and water can be separated by:", options: ["Boiling", "Filtering", "Freezing", "Melting"], correct: 1 }
+      ],
+      7: [
+        { q: "A substance made of only one type of atom is called an:", options: ["Compound", "Mixture", "Element", "Solution"], correct: 2 },
+        { q: "What is the centre of an atom called?", options: ["Electron", "Nucleus", "Shell", "Ion"], correct: 1 },
+        { q: "Which particle in an atom has a negative charge?", options: ["Proton", "Neutron", "Electron", "Nucleus"], correct: 2 },
+        { q: "Table salt is a compound of chlorine and:", options: ["Oxygen", "Sodium", "Carbon", "Iron"], correct: 1 },
+        { q: "The chemical symbol for oxygen is:", options: ["O", "Ox", "Og", "Oy"], correct: 0 },
+        { q: "A substance that speeds up a reaction without being used up is a:", options: ["Solvent", "Catalyst", "Reactant", "Product"], correct: 1 }
+      ],
+      8: [
+        { q: "The horizontal rows in the periodic table are called:", options: ["Groups", "Periods", "Families", "Shells"], correct: 1 },
+        { q: "What forms when two or more elements chemically combine?", options: ["Mixture", "Solution", "Compound", "Alloy"], correct: 2 },
+        { q: "The pH of a neutral solution (like pure water) is:", options: ["0", "7", "14", "1"], correct: 1 },
+        { q: "A reaction that gives off heat is described as:", options: ["Endothermic", "Exothermic", "Neutral", "Reversible"], correct: 1 },
+        { q: "Which gas is produced when a metal reacts with an acid?", options: ["Oxygen", "Carbon dioxide", "Hydrogen", "Nitrogen"], correct: 2 },
+        { q: "The chemical formula for water is:", options: ["CO2", "H2O", "O2", "NaCl"], correct: 1 }
+      ],
+      9: [
+        { q: "A chemical bond formed by sharing electrons is a:", options: ["Ionic bond", "Covalent bond", "Metallic bond", "Magnetic bond"], correct: 1 },
+        { q: "Atoms of the same element with different numbers of neutrons are:", options: ["Ions", "Isotopes", "Molecules", "Compounds"], correct: 1 },
+        { q: "In the reaction 2H2 + O2 → 2H2O, water is the:", options: ["Reactant", "Catalyst", "Product", "Solvent"], correct: 2 },
+        { q: "A positively charged ion is called a:", options: ["Anion", "Cation", "Isotope", "Electron"], correct: 1 },
+        { q: "The number of protons in an atom is its:", options: ["Mass number", "Atomic number", "Charge", "Valency"], correct: 1 },
+        { q: "Acids release which ion when dissolved in water?", options: ["Hydroxide (OH⁻)", "Hydrogen (H⁺)", "Sodium (Na⁺)", "Chloride (Cl⁻)"], correct: 1 }
+      ]
+    },
+    physics: {
+      6: [
+        { q: "A push or a pull is called a:", options: ["Energy", "Force", "Mass", "Speed"], correct: 1 },
+        { q: "The force that pulls objects down towards Earth is:", options: ["Friction", "Magnetism", "Gravity", "Tension"], correct: 2 },
+        { q: "The unit used to measure force is the:", options: ["Joule", "Watt", "Newton", "Volt"], correct: 2 },
+        { q: "The energy stored in a stretched rubber band is:", options: ["Kinetic energy", "Elastic potential energy", "Heat energy", "Sound energy"], correct: 1 },
+        { q: "Which of these is a natural source of light?", options: ["The Moon", "A mirror", "The Sun", "A window"], correct: 2 },
+        { q: "A material that lets electricity flow through it is a:", options: ["Insulator", "Conductor", "Resistor", "Magnet"], correct: 1 }
+      ],
+      7: [
+        { q: "Speed is calculated as distance divided by:", options: ["Mass", "Time", "Force", "Area"], correct: 1 },
+        { q: "The energy an object has because it is moving is called:", options: ["Potential energy", "Kinetic energy", "Chemical energy", "Nuclear energy"], correct: 1 },
+        { q: "Heat travels through a metal spoon mainly by:", options: ["Convection", "Radiation", "Conduction", "Evaporation"], correct: 2 },
+        { q: "When light bounces off a surface, this is called:", options: ["Refraction", "Reflection", "Diffraction", "Absorption"], correct: 1 },
+        { q: "Which unit is used to measure energy?", options: ["Newton", "Joule", "Ampere", "Pascal"], correct: 1 },
+        { q: "The force that opposes motion between two surfaces is:", options: ["Gravity", "Tension", "Friction", "Thrust"], correct: 2 }
+      ],
+      8: [
+        { q: "The unit of electric current is the:", options: ["Volt", "Ohm", "Ampere", "Watt"], correct: 2 },
+        { q: "Sound travels fastest through which type of material?", options: ["Gases", "Liquids", "Solids", "A vacuum"], correct: 2 },
+        { q: "A device that measures electric current is an:", options: ["Voltmeter", "Ammeter", "Thermometer", "Barometer"], correct: 1 },
+        { q: "The bending of light as it passes from air into water is:", options: ["Reflection", "Refraction", "Dispersion", "Diffraction"], correct: 1 },
+        { q: "In a series circuit, the electric current is:", options: ["Zero", "Different at every point", "The same everywhere", "Always doubled"], correct: 2 },
+        { q: "The turning effect of a force is called a:", options: ["Momentum", "Moment", "Pressure", "Power"], correct: 1 }
+      ],
+      9: [
+        { q: "Newton's First Law of motion is also known as the law of:", options: ["Gravity", "Inertia", "Acceleration", "Momentum"], correct: 1 },
+        { q: "Acceleration is the rate of change of:", options: ["Distance", "Velocity", "Mass", "Force"], correct: 1 },
+        { q: "Work done is calculated as force multiplied by:", options: ["Time", "Distance", "Mass", "Speed"], correct: 1 },
+        { q: "Ohm's law states that voltage V = I × ___ .", options: ["Power", "Charge", "Resistance", "Time"], correct: 2 },
+        { q: "The unit of power is the:", options: ["Joule", "Newton", "Watt", "Volt"], correct: 2 },
+        { q: "'Every action has an equal and opposite reaction' is Newton's:", options: ["First law", "Second law", "Third law", "Law of gravity"], correct: 2 }
+      ]
+    }
   };
 
-  var state = load();
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+  }
 
-  function load() {
+  function loadState(sub, grade, meta) {
+    var key = "sci-test-" + sub + "-" + grade + "-v1";
     try {
-      var raw = localStorage.getItem(KEY);
+      var raw = localStorage.getItem(key);
       if (raw) {
         var p = JSON.parse(raw);
         if (p && Array.isArray(p.questions)) return p;
       }
     } catch (e) {}
-    return JSON.parse(JSON.stringify(seed));
+    return { title: meta.name + " — Grade " + grade, questions: JSON.parse(JSON.stringify(BANK[sub][grade])) };
   }
-  function save() {
-    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+
+  function applyTheme(meta) {
+    var root = document.documentElement.style;
+    root.setProperty("--teal", meta.accent);
+    root.setProperty("--teal-dark", meta.dark);
+    var hdr = document.querySelector("header");
+    hdr.style.background = meta.grad;
+    hdr.style.borderBottomColor = meta.accent;
+  }
+
+  function getParams() {
+    var out = {};
+    window.location.search.replace(/^\?/, "").split("&").forEach(function (pair) {
+      var kv = pair.split("=");
+      if (kv[0]) out[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1] || "");
+    });
+    return out;
+  }
+
+  function loadTest(sub, grade) {
+    if (!SUBJECTS[sub]) sub = "biology";
+    grade = GRADES.indexOf(grade) >= 0 ? grade : 6;
+    currentSubject = sub;
+    currentGrade = grade;
+    KEY = "sci-test-" + sub + "-" + grade + "-v1";
+    var meta = SUBJECTS[sub];
+    state = loadState(sub, grade, meta);
+    document.getElementById("sel-subject").value = sub;
+    document.getElementById("sel-grade").value = String(grade);
+    document.getElementById("eyebrow").innerHTML = meta.emoji + "&nbsp; " + meta.name + " &middot; Grade " + grade;
+    document.getElementById("head-title").textContent = meta.name + ": Grade " + grade + " Test";
+    document.getElementById("head-sub").textContent = "A " + meta.name.toLowerCase() + " quiz on " + meta.blurb + ". Take it or build your own, then get scored instantly.";
+    document.title = meta.name + " · Grade " + grade + " — Spark Science Lab";
+    document.getElementById("test-title").value = state.title;
+    applyTheme(meta);
+    try { history.replaceState(null, "", "?subject=" + sub + "&grade=" + grade); } catch (e) {}
+    renderBuild();
+  }
+
+  function switchTest(sub, grade) {
+    loadTest(sub, grade);
+    if (currentTab === "take") renderTake();
   }
 
   // ---------- element refs ----------
@@ -336,7 +491,6 @@
   var answers = {}; // questionIndex -> chosen option index (take mode)
   var submitted = false;
 
-  titleInput.value = state.title;
   titleInput.addEventListener("input", function () {
     state.title = titleInput.value;
     save();
@@ -370,7 +524,7 @@
     if (n === 0) {
       var e = document.createElement("div");
       e.className = "card empty";
-      e.innerHTML = '<div class="seq"><span class="A">A</span><span class="T">T</span><span class="G">G</span><span class="C">C</span></div>No questions yet — add your first one below.';
+      e.innerHTML = '<div class="seq" style="font-size:30px">✏️</div>No questions yet — add your first one below.';
       qList.appendChild(e);
       return;
     }
@@ -440,7 +594,7 @@
     answers = {};
     takeBody.innerHTML = "";
     if (state.questions.length === 0) {
-      takeBody.innerHTML = '<div class="card empty"><div class="seq"><span class="A">A</span><span class="T">T</span><span class="G">G</span><span class="C">C</span></div>This test has no questions yet.<br>Switch to <strong>Build</strong> to add some.</div>';
+      takeBody.innerHTML = '<div class="card empty"><div class="seq" style="font-size:30px">📝</div>This test has no questions yet.<br>Switch to <strong>Build</strong> to add some.</div>';
       return;
     }
     var titleWrap = document.createElement("div");
@@ -539,6 +693,7 @@
   var tabTake = document.getElementById("tab-take");
   function selectTab(which) {
     var build = which === "build";
+    currentTab = which;
     tabBuild.setAttribute("aria-selected", build);
     tabTake.setAttribute("aria-selected", !build);
     document.getElementById("panel-build").classList.toggle("active", build);
@@ -548,8 +703,22 @@
   tabBuild.addEventListener("click", function () { selectTab("build"); });
   tabTake.addEventListener("click", function () { selectTab("take"); });
 
-  renderBuild();
-  // Arriving from the home page's "Take the Test" button opens straight into take mode.
+  // ---------- populate subject / grade switcher ----------
+  var selSubject = document.getElementById("sel-subject");
+  var selGrade = document.getElementById("sel-grade");
+  selSubject.innerHTML = Object.keys(SUBJECTS).map(function (k) {
+    return '<option value="' + k + '">' + SUBJECTS[k].emoji + "  " + SUBJECTS[k].name + "</option>";
+  }).join("");
+  selGrade.innerHTML = GRADES.map(function (g) {
+    return '<option value="' + g + '">Grade ' + g + "</option>";
+  }).join("");
+  selSubject.addEventListener("change", function () { switchTest(selSubject.value, +selGrade.value); });
+  selGrade.addEventListener("change", function () { switchTest(selSubject.value, +selGrade.value); });
+
+  // ---------- initial load from URL (?subject=&grade=) ----------
+  var params = getParams();
+  loadTest(params.subject || "biology", parseInt(params.grade, 10) || 6);
+  // Arriving from a "Take the Test" link opens straight into take mode.
   if (window.location.hash === "#take") selectTab("take");
 
   // ---------- animated double helix ----------
