@@ -3,13 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Double Helix Test Lab</title>
-</head>
-<body>
+<title>The Double Helix Test Lab — Biology DNA Quiz</title>
 <style>
   :root {
     --ink: #132029;
-    --ink-soft: #1d2f3a;
+    --ink-2: #0d1a22;
     --paper: #f5f8f7;
     --card: #ffffff;
     --border: #dbe4e0;
@@ -21,210 +19,88 @@
     --T: #e4572e;
     --G: #e0a422;
     --C: #2e7dd2;
-    --good-bg: #e6f4ec;
-    --good-line: #38a169;
-    --bad-bg: #fcece7;
-    --bad-line: #e4572e;
     --serif: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
     --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace;
-    --shadow: 0 1px 2px rgba(19,32,41,.05), 0 6px 20px rgba(19,32,41,.06);
+    --shadow: 0 1px 2px rgba(19,32,41,.05), 0 10px 30px rgba(19,32,41,.08);
   }
-
   * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    background: var(--paper);
-    color: var(--text);
-    font-family: var(--sans);
-    line-height: 1.55;
-    -webkit-font-smoothing: antialiased;
-  }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--paper); color: var(--text); font-family: var(--sans); line-height: 1.6; -webkit-font-smoothing: antialiased; }
   h1, h2, h3 { font-family: var(--serif); font-weight: 600; text-wrap: balance; margin: 0; }
-  button { font-family: inherit; cursor: pointer; }
-  input, textarea { font-family: inherit; }
+  a { color: inherit; }
 
-  /* ---- Header ---- */
-  header {
-    position: relative;
-    background: var(--ink);
-    color: #eef4f2;
-    overflow: hidden;
-    border-bottom: 3px solid var(--teal);
-  }
-  #helix { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .55; }
-  .head-inner {
-    position: relative;
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 40px 24px 34px;
-  }
-  .eyebrow {
-    font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: .22em;
-    text-transform: uppercase;
-    color: #7fd6cf;
-    margin: 0 0 10px;
-  }
-  header h1 { font-size: clamp(30px, 5vw, 46px); line-height: 1.05; color: #fff; }
-  header p.sub { margin: 12px 0 0; max-width: 46ch; color: #b7c8c6; font-size: 15px; }
-  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 22px; font-family: var(--mono); font-size: 12px; }
-  .legend span { display: inline-flex; align-items: center; gap: 6px; color: #cdddda; }
+  /* ---------- Hero ---------- */
+  .hero { position: relative; background: var(--ink); color: #eef4f2; overflow: hidden; border-bottom: 3px solid var(--teal); }
+  #helix { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .5; }
+  .hero-veil { position: absolute; inset: 0; background: radial-gradient(120% 90% at 70% 20%, transparent 30%, rgba(13,26,34,.55) 100%); pointer-events: none; }
+  .hero-inner { position: relative; max-width: 860px; margin: 0 auto; padding: 88px 24px 74px; text-align: center; }
+  .eyebrow { font-family: var(--mono); font-size: 12.5px; letter-spacing: .26em; text-transform: uppercase; color: #7fd6cf; margin: 0 0 20px; }
+  .hero h1 { font-size: clamp(38px, 7vw, 68px); line-height: 1.02; color: #fff; letter-spacing: -.01em; }
+  .hero .lede { max-width: 52ch; margin: 20px auto 0; color: #c2d3d0; font-size: clamp(16px, 2.2vw, 19px); }
+
+  .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 34px; }
+  .btn { display: inline-flex; align-items: center; gap: 9px; font-family: var(--sans); font-size: 16px; font-weight: 600; padding: 14px 28px; border-radius: 11px; text-decoration: none; border: 1px solid transparent; transition: transform .08s, background .16s, border-color .16s; cursor: pointer; }
+  .btn-primary { background: var(--teal); color: #fff; box-shadow: 0 4px 16px rgba(14,124,123,.4); }
+  .btn-primary:hover { background: #14938f; }
+  .btn-primary .arrow { transition: transform .18s; }
+  .btn-primary:hover .arrow { transform: translateX(4px); }
+  .btn-ghost { background: rgba(255,255,255,.06); color: #eef4f2; border-color: rgba(255,255,255,.28); }
+  .btn-ghost:hover { background: rgba(255,255,255,.13); border-color: rgba(255,255,255,.5); }
+  .btn:active { transform: translateY(1px); }
+  .btn:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+  .legend { display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; margin-top: 40px; font-family: var(--mono); font-size: 12px; }
+  .legend span { display: inline-flex; align-items: center; gap: 7px; color: #b7c8c6; }
   .dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
 
-  /* ---- Layout ---- */
-  main { max-width: 900px; margin: 0 auto; padding: 0 24px 80px; }
+  /* ---------- Content ---------- */
+  main { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+  .section { padding: 72px 0 8px; }
+  .section > h2 { font-size: clamp(24px, 3.6vw, 32px); color: var(--ink); text-align: center; }
+  .section > p.intro { text-align: center; color: var(--muted); max-width: 56ch; margin: 12px auto 0; }
 
-  .tabs {
-    display: flex;
-    gap: 4px;
-    background: #e7edeb;
-    padding: 5px;
-    border-radius: 12px;
-    margin: -26px auto 26px;
-    position: relative;
-    width: fit-content;
-    box-shadow: var(--shadow);
-    border: 1px solid var(--border);
-  }
-  .tab {
-    border: 0; background: transparent; color: var(--muted);
-    padding: 9px 22px; border-radius: 8px; font-size: 15px; font-weight: 600;
-    transition: background .18s, color .18s;
-  }
-  .tab[aria-selected="true"] { background: var(--card); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.08); }
-  .tab:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 40px; }
+  .feature { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 26px 22px; box-shadow: var(--shadow); }
+  .feature .step { font-family: var(--mono); font-size: 12px; font-weight: 700; letter-spacing: .12em; color: var(--teal-dark); }
+  .feature h3 { font-size: 20px; color: var(--ink); margin: 14px 0 8px; }
+  .feature p { margin: 0; color: var(--muted); font-size: 15px; }
+  .feature .bar { width: 34px; height: 4px; border-radius: 4px; margin-top: 18px; }
 
-  .panel { display: none; }
-  .panel.active { display: block; animation: fade .25s ease; }
-  @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  /* ---------- What's inside ---------- */
+  .inside { margin: 64px 0 0; background: var(--card); border: 1px solid var(--border); border-radius: 20px; box-shadow: var(--shadow); padding: 40px 34px; display: grid; grid-template-columns: 1.1fr 1fr; gap: 34px; align-items: center; }
+  .inside h2 { font-size: 26px; color: var(--ink); }
+  .inside p { color: var(--muted); margin: 12px 0 0; }
+  .topic-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .topic-list li { display: flex; gap: 12px; align-items: baseline; font-size: 15px; color: var(--text); }
+  .topic-list .seq { font-family: var(--mono); font-weight: 700; font-size: 13px; flex-shrink: 0; width: 26px; }
 
-  /* ---- Test title bar ---- */
-  .titlebar {
-    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
-    margin-bottom: 20px;
-  }
-  .titlebar input {
-    flex: 1; min-width: 220px;
-    font-family: var(--serif); font-size: 24px; font-weight: 600; color: var(--ink);
-    border: 0; border-bottom: 2px dashed var(--border); background: transparent;
-    padding: 4px 2px;
-  }
-  .titlebar input:focus { outline: none; border-bottom-color: var(--teal); }
-  .count-pill {
-    font-family: var(--mono); font-size: 12px; color: var(--teal-dark);
-    background: #e0f0ef; border: 1px solid #bfe0dd; padding: 4px 10px; border-radius: 999px;
-    white-space: nowrap;
-  }
+  .final-cta { text-align: center; padding: 74px 0 30px; }
+  .final-cta h2 { font-size: clamp(24px, 4vw, 34px); color: var(--ink); }
+  .final-cta p { color: var(--muted); margin: 10px auto 26px; max-width: 44ch; }
 
-  /* ---- Cards ---- */
-  .card {
-    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
-    padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow);
-  }
-  .q-head { display: flex; align-items: flex-start; gap: 12px; }
-  .q-num {
-    font-family: var(--mono); font-size: 13px; font-weight: 700; color: #fff;
-    background: var(--teal); min-width: 30px; height: 30px; border-radius: 8px;
-    display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
-  }
-  .q-text { font-size: 17px; font-weight: 600; color: var(--ink); flex: 1; padding-top: 3px; }
-  .q-opts { list-style: none; margin: 14px 0 0; padding: 0 0 0 42px; display: grid; gap: 8px; }
-  .q-opts li {
-    padding: 9px 14px; border: 1px solid var(--border); border-radius: 9px;
-    font-size: 15px; color: var(--text); background: #fbfdfc; display: flex; gap: 10px; align-items: center;
-  }
-  .q-opts li.correct { background: var(--good-bg); border-color: var(--good-line); color: #1f5d3b; font-weight: 600; }
-  .q-opts li .mark { font-family: var(--mono); font-size: 12px; color: var(--muted); font-weight: 700; }
-  .q-opts li.correct .mark { color: var(--good-line); }
-  .row-actions { display: flex; gap: 8px; margin-top: 6px; }
-  .icon-btn {
-    border: 1px solid var(--border); background: #fff; color: var(--muted);
-    border-radius: 8px; padding: 5px 12px; font-size: 13px; font-weight: 600;
-  }
-  .icon-btn:hover { border-color: var(--bad-line); color: var(--bad-line); }
-  .icon-btn:focus-visible { outline: 2px solid var(--teal); outline-offset: 1px; }
-
-  /* ---- Add-question form ---- */
-  .builder { background: var(--card); border: 1px dashed var(--teal); border-radius: 14px; padding: 22px; box-shadow: var(--shadow); }
-  .builder h3 { font-size: 18px; color: var(--ink); margin-bottom: 4px; }
-  .builder .hint { color: var(--muted); font-size: 13px; margin: 0 0 16px; }
-  label.fld { display: block; font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 6px; letter-spacing: .01em; }
-  .builder textarea, .builder .opt-in input[type="text"] {
-    width: 100%; border: 1px solid var(--border); border-radius: 9px; padding: 10px 12px;
-    font-size: 15px; background: #fbfdfc; color: var(--text); resize: vertical;
-  }
-  .builder textarea:focus, .builder .opt-in input:focus { outline: 2px solid var(--teal); outline-offset: -1px; border-color: var(--teal); }
-  .opt-grid { display: grid; gap: 10px; margin: 6px 0 4px; }
-  .opt-in { display: flex; align-items: center; gap: 10px; }
-  .opt-in input[type="radio"] { width: 18px; height: 18px; accent-color: var(--teal); flex-shrink: 0; }
-  .opt-in .tag { font-family: var(--mono); font-size: 12px; color: var(--muted); width: 58px; flex-shrink: 0; }
-  .radio-hint { font-size: 12px; color: var(--muted); margin: 0 0 14px; padding-left: 68px; }
-  .btn {
-    background: var(--teal); color: #fff; border: 0; border-radius: 10px;
-    padding: 11px 20px; font-size: 15px; font-weight: 600; box-shadow: 0 2px 6px rgba(14,124,123,.25);
-    transition: background .16s, transform .08s;
-  }
-  .btn:hover { background: var(--teal-dark); }
-  .btn:active { transform: translateY(1px); }
-  .btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-  .btn.ghost { background: transparent; color: var(--teal-dark); border: 1px solid var(--teal); box-shadow: none; }
-  .btn.ghost:hover { background: #e0f0ef; }
-  .form-actions { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
-
-  /* ---- Take mode ---- */
-  .take-opts { list-style: none; margin: 14px 0 0; padding: 0 0 0 42px; display: grid; gap: 8px; }
-  .take-opts label {
-    display: flex; gap: 11px; align-items: center; padding: 11px 14px;
-    border: 1px solid var(--border); border-radius: 9px; cursor: pointer; background: #fbfdfc;
-    font-size: 15px; transition: border-color .14s, background .14s;
-  }
-  .take-opts label:hover { border-color: var(--teal); background: #f2faf9; }
-  .take-opts input { accent-color: var(--teal); width: 17px; height: 17px; }
-  .take-opts label.pick { border-color: var(--teal); background: #eaf6f5; }
-  .take-opts label.reveal-correct { background: var(--good-bg); border-color: var(--good-line); }
-  .take-opts label.reveal-wrong { background: var(--bad-bg); border-color: var(--bad-line); }
-  .verdict { font-family: var(--mono); font-size: 12px; font-weight: 700; margin-left: auto; }
-  .verdict.ok { color: var(--good-line); }
-  .verdict.no { color: var(--bad-line); }
-
-  .scorecard {
-    background: var(--ink); color: #fff; border-radius: 16px; padding: 26px 28px;
-    margin-bottom: 22px; display: flex; align-items: center; gap: 26px; flex-wrap: wrap;
-  }
-  .score-ring {
-    --pct: 0;
-    width: 92px; height: 92px; border-radius: 50%; flex-shrink: 0;
-    background: conic-gradient(var(--teal) calc(var(--pct) * 1%), #2a3d47 0);
-    display: grid; place-items: center;
-  }
-  .score-ring i {
-    width: 70px; height: 70px; border-radius: 50%; background: var(--ink);
-    display: grid; place-items: center; font-style: normal;
-    font-family: var(--mono); font-size: 22px; font-weight: 700;
-  }
-  .scorecard .msg h2 { color: #fff; font-size: 24px; }
-  .scorecard .msg p { margin: 6px 0 0; color: #b7c8c6; font-size: 14px; }
-
-  .empty { text-align: center; color: var(--muted); padding: 48px 20px; }
-  .empty .seq { font-family: var(--mono); font-size: 15px; letter-spacing: .3em; margin-bottom: 10px; }
-
-  footer { text-align: center; color: var(--muted); font-size: 13px; padding: 24px; font-family: var(--mono); }
+  footer { text-align: center; color: var(--muted); font-size: 13px; padding: 30px 24px 40px; font-family: var(--mono); }
   .A { color: var(--A); } .T { color: var(--T); } .G { color: var(--G); } .C { color: var(--C); }
 
-  @media (max-width: 560px) {
-    .q-opts, .take-opts { padding-left: 0; }
-    .radio-hint { padding-left: 0; }
+  @media (max-width: 720px) {
+    .cards { grid-template-columns: 1fr; }
+    .inside { grid-template-columns: 1fr; padding: 30px 24px; }
   }
 </style>
+</head>
+<body>
 
-<header>
+<header class="hero">
   <canvas id="helix" aria-hidden="true"></canvas>
-  <div class="head-inner">
-    <p class="eyebrow">Molecular Biology · Assessment Builder</p>
-    <h1>The Double Helix Test Lab</h1>
-    <p class="sub">Build a biology quiz on DNA — structure, replication, and the genetic code — then take it and get scored instantly.</p>
+  <div class="hero-veil"></div>
+  <div class="hero-inner">
+    <p class="eyebrow">Molecular Biology · Interactive Quiz</p>
+    <h1>The Double Helix<br>Test Lab</h1>
+    <p class="lede">A hands-on biology quiz on DNA — its structure, base pairing, replication, and the genetic code. Take the ready-made test, or build your own and score it instantly.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="test.html#take">Take the Test <span class="arrow" aria-hidden="true">&rarr;</span></a>
+      <a class="btn btn-ghost" href="test.html">Build your own</a>
+    </div>
     <div class="legend" aria-hidden="true">
       <span><i class="dot" style="background:var(--A)"></i>Adenine</span>
       <span><i class="dot" style="background:var(--T)"></i>Thymine</span>
@@ -235,309 +111,60 @@
 </header>
 
 <main>
-  <div class="tabs" role="tablist" aria-label="Modes">
-    <button class="tab" id="tab-build" role="tab" aria-selected="true" aria-controls="panel-build">Build</button>
-    <button class="tab" id="tab-take" role="tab" aria-selected="false" aria-controls="panel-take">Take Test</button>
-  </div>
-
-  <!-- BUILD -->
-  <section class="panel active" id="panel-build" role="tabpanel" aria-labelledby="tab-build">
-    <div class="titlebar">
-      <input id="test-title" value="DNA: Structure &amp; Replication" aria-label="Test title" />
-      <span class="count-pill" id="build-count">0 questions</span>
+  <section class="section">
+    <h2>How it works</h2>
+    <p class="intro">Three steps from a blank page to a scored biology test.</p>
+    <div class="cards">
+      <div class="feature">
+        <span class="step">STEP 01</span>
+        <h3>Build</h3>
+        <p>Write your own multiple-choice questions and mark the correct answer — or start from the eight DNA questions already loaded.</p>
+        <div class="bar" style="background:var(--A)"></div>
+      </div>
+      <div class="feature">
+        <span class="step">STEP 02</span>
+        <h3>Take</h3>
+        <p>Answer each question, then submit. The test locks in your choices and checks them against the key.</p>
+        <div class="bar" style="background:var(--G)"></div>
+      </div>
+      <div class="feature">
+        <span class="step">STEP 03</span>
+        <h3>Score</h3>
+        <p>Get an instant percentage and a question-by-question review — correct answers in green, misses in red.</p>
+        <div class="bar" style="background:var(--C)"></div>
+      </div>
     </div>
 
-    <div id="q-list"></div>
-
-    <div class="builder">
-      <h3>Add a question</h3>
-      <p class="hint">Write the question, fill in four answers, and mark the correct one.</p>
-      <div style="margin-bottom:14px">
-        <label class="fld" for="q-input">Question</label>
-        <textarea id="q-input" rows="2" placeholder="e.g. Which base pairs with adenine in DNA?"></textarea>
+    <div class="inside">
+      <div>
+        <h2>What's on the test</h2>
+        <p>The starter quiz covers the core of DNA biology — everything a first molecular-biology unit expects you to know. Add, edit, or delete questions any time; your test saves to your browser automatically.</p>
       </div>
-      <label class="fld">Answer choices · select the correct one</label>
-      <div class="opt-grid" id="opt-grid"></div>
-      <p class="radio-hint">The selected radio marks the correct answer.</p>
-      <div class="form-actions">
-        <button class="btn" id="add-btn">Add question</button>
-        <button class="btn ghost" id="clear-btn">Clear all</button>
-      </div>
+      <ul class="topic-list">
+        <li><span class="seq"><span class="A">A</span><span class="T">T</span></span> Base pairing &amp; the rules of complementarity</li>
+        <li><span class="seq"><span class="G">G</span><span class="C">C</span></span> Hydrogen bonds &amp; the double-helix structure</li>
+        <li><span class="seq"><span class="A">A</span><span class="G">G</span></span> The sugar-phosphate backbone &amp; nucleotides</li>
+        <li><span class="seq"><span class="C">C</span><span class="T">T</span></span> Semi-conservative replication &amp; its enzymes</li>
+      </ul>
     </div>
   </section>
 
-  <!-- TAKE -->
-  <section class="panel" id="panel-take" role="tabpanel" aria-labelledby="tab-take">
-    <div id="take-body"></div>
+  <section class="final-cta">
+    <h2>Ready to test your DNA knowledge?</h2>
+    <p>No sign-up, no download — it runs right here in your browser.</p>
+    <a class="btn btn-primary" href="test.html#take" style="box-shadow:0 4px 16px rgba(14,124,123,.3)">Take the Test <span class="arrow" aria-hidden="true">&rarr;</span></a>
   </section>
 </main>
 
 <footer>
-  <span class="A">A</span><span class="T">T</span><span class="G">G</span><span class="C">C</span> · saved to this browser
+  <span class="A">A</span><span class="T">T</span><span class="G">G</span><span class="C">C</span> · The Double Helix Test Lab
 </footer>
 
 <script>
 (function () {
   "use strict";
-  var LETTERS = ["A", "B", "C", "D"];
-  var KEY = "dna-test-lab-v1";
-
-  var seed = {
-    title: "DNA: Structure & Replication",
-    questions: [
-      { q: "Which nitrogenous base pairs with adenine in DNA?", options: ["Thymine", "Guanine", "Cytosine", "Uracil"], correct: 0 },
-      { q: "What type of bond holds the two strands of the DNA double helix together?", options: ["Peptide bonds", "Hydrogen bonds", "Ionic bonds", "Disulfide bonds"], correct: 1 },
-      { q: "The sugar found in the backbone of a DNA molecule is:", options: ["Ribose", "Glucose", "Deoxyribose", "Fructose"], correct: 2 },
-      { q: "DNA replication is described as semi-conservative because each new molecule contains:", options: ["Two brand-new strands", "One original and one new strand", "Only original strands", "Fragments from many molecules"], correct: 1 },
-      { q: "Which enzyme adds new nucleotides to a growing DNA strand?", options: ["Helicase", "Ligase", "DNA polymerase", "Primase"], correct: 2 },
-      { q: "How many hydrogen bonds form between guanine and cytosine?", options: ["One", "Two", "Three", "Four"], correct: 2 },
-      { q: "The two strands of DNA are described as antiparallel, meaning they run:", options: ["In the same 5' to 3' direction", "In opposite directions", "Perpendicular to each other", "In a random orientation"], correct: 1 },
-      { q: "A nucleotide is made of a phosphate group, a nitrogenous base, and a:", options: ["Fatty acid", "Amino acid", "Sugar", "Ribosome"], correct: 2 }
-    ]
-  };
-
-  var state = load();
-
-  function load() {
-    try {
-      var raw = localStorage.getItem(KEY);
-      if (raw) {
-        var p = JSON.parse(raw);
-        if (p && Array.isArray(p.questions)) return p;
-      }
-    } catch (e) {}
-    return JSON.parse(JSON.stringify(seed));
-  }
-  function save() {
-    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
-  }
-
-  // ---------- element refs ----------
-  var qList = document.getElementById("q-list");
-  var buildCount = document.getElementById("build-count");
-  var titleInput = document.getElementById("test-title");
-  var optGrid = document.getElementById("opt-grid");
-  var qInput = document.getElementById("q-input");
-  var takeBody = document.getElementById("take-body");
-  var answers = {}; // questionIndex -> chosen option index (take mode)
-  var submitted = false;
-
-  titleInput.value = state.title;
-  titleInput.addEventListener("input", function () {
-    state.title = titleInput.value;
-    save();
-  });
-
-  // ---------- build the add-question option inputs ----------
-  optGrid.innerHTML = "";
-  LETTERS.forEach(function (L, i) {
-    var wrap = document.createElement("div");
-    wrap.className = "opt-in";
-    wrap.innerHTML =
-      '<input type="radio" name="new-correct" value="' + i + '" ' + (i === 0 ? "checked " : "") +
-      'aria-label="Mark choice ' + L + ' correct">' +
-      '<span class="tag">' + L + '</span>' +
-      '<input type="text" class="new-opt" data-i="' + i + '" placeholder="Answer ' + L + '">';
-    optGrid.appendChild(wrap);
-  });
-  var newOpts = Array.prototype.slice.call(optGrid.querySelectorAll(".new-opt"));
-
-  function esc(s) {
-    return String(s).replace(/[&<>"]/g, function (c) {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
-    });
-  }
-
-  // ---------- render build list ----------
-  function renderBuild() {
-    var n = state.questions.length;
-    buildCount.textContent = n + (n === 1 ? " question" : " questions");
-    qList.innerHTML = "";
-    if (n === 0) {
-      var e = document.createElement("div");
-      e.className = "card empty";
-      e.innerHTML = '<div class="seq"><span class="A">A</span><span class="T">T</span><span class="G">G</span><span class="C">C</span></div>No questions yet — add your first one below.';
-      qList.appendChild(e);
-      return;
-    }
-    state.questions.forEach(function (item, idx) {
-      var card = document.createElement("div");
-      card.className = "card";
-      var opts = item.options.map(function (o, i) {
-        var ok = i === item.correct;
-        return '<li class="' + (ok ? "correct" : "") + '"><span class="mark">' + LETTERS[i] + "</span>" +
-          esc(o) + (ok ? '<span class="mark" style="margin-left:auto">✓ correct</span>' : "") + "</li>";
-      }).join("");
-      card.innerHTML =
-        '<div class="q-head"><span class="q-num">' + (idx + 1) + '</span>' +
-        '<span class="q-text">' + esc(item.q) + "</span></div>" +
-        '<ul class="q-opts">' + opts + "</ul>" +
-        '<div class="row-actions"><button class="icon-btn" data-del="' + idx + '">Delete</button></div>';
-      qList.appendChild(card);
-    });
-    qList.querySelectorAll("[data-del]").forEach(function (b) {
-      b.addEventListener("click", function () {
-        state.questions.splice(+b.getAttribute("data-del"), 1);
-        save();
-        renderBuild();
-      });
-    });
-  }
-
-  // ---------- add question ----------
-  document.getElementById("add-btn").addEventListener("click", function () {
-    var q = qInput.value.trim();
-    var options = newOpts.map(function (i) { return i.value.trim(); });
-    var filled = options.filter(function (o) { return o; }).length;
-    if (!q) { flash(qInput); return; }
-    if (filled < 2) { newOpts.forEach(function (i) { if (!i.value.trim()) flash(i); }); return; }
-    var correct = +optGrid.querySelector('input[name="new-correct"]:checked').value;
-    if (!options[correct]) {
-      // correct choice was left blank — pick first non-empty
-      correct = options.findIndex(function (o) { return o; });
-    }
-    // drop trailing blank options but keep the correct one's index valid
-    state.questions.push({ q: q, options: options.map(function (o) { return o || ""; }), correct: correct });
-    save();
-    qInput.value = "";
-    newOpts.forEach(function (i) { i.value = ""; });
-    optGrid.querySelector('input[value="0"]').checked = true;
-    renderBuild();
-    qInput.focus();
-  });
-
-  document.getElementById("clear-btn").addEventListener("click", function () {
-    if (state.questions.length && !confirm("Remove all questions from this test?")) return;
-    state.questions = [];
-    save();
-    renderBuild();
-  });
-
-  function flash(el) {
-    el.style.transition = "box-shadow .3s";
-    el.style.boxShadow = "0 0 0 3px rgba(228,87,46,.35)";
-    el.focus();
-    setTimeout(function () { el.style.boxShadow = ""; }, 600);
-  }
-
-  // ---------- take mode ----------
-  function renderTake() {
-    submitted = false;
-    answers = {};
-    takeBody.innerHTML = "";
-    if (state.questions.length === 0) {
-      takeBody.innerHTML = '<div class="card empty"><div class="seq"><span class="A">A</span><span class="T">T</span><span class="G">G</span><span class="C">C</span></div>This test has no questions yet.<br>Switch to <strong>Build</strong> to add some.</div>';
-      return;
-    }
-    var titleWrap = document.createElement("div");
-    titleWrap.className = "titlebar";
-    titleWrap.innerHTML = '<h2 style="flex:1;font-size:26px;color:var(--ink)">' + esc(state.title) + '</h2>' +
-      '<span class="count-pill">' + state.questions.length + ' questions</span>';
-    takeBody.appendChild(titleWrap);
-
-    var scoreSlot = document.createElement("div");
-    scoreSlot.id = "score-slot";
-    takeBody.appendChild(scoreSlot);
-
-    state.questions.forEach(function (item, idx) {
-      var card = document.createElement("div");
-      card.className = "card";
-      card.id = "take-q-" + idx;
-      var opts = item.options.map(function (o, i) {
-        if (!o) return "";
-        return '<li><label data-q="' + idx + '" data-i="' + i + '">' +
-          '<input type="radio" name="take-' + idx + '" value="' + i + '">' +
-          '<span>' + esc(o) + "</span></label></li>";
-      }).join("");
-      card.innerHTML =
-        '<div class="q-head"><span class="q-num">' + (idx + 1) + '</span>' +
-        '<span class="q-text">' + esc(item.q) + "</span></div>" +
-        '<ul class="take-opts">' + opts + "</ul>";
-      takeBody.appendChild(card);
-    });
-
-    takeBody.querySelectorAll(".take-opts label").forEach(function (lab) {
-      lab.addEventListener("click", function () {
-        if (submitted) return;
-        var qi = +lab.getAttribute("data-q");
-        answers[qi] = +lab.getAttribute("data-i");
-        takeBody.querySelectorAll('[data-q="' + qi + '"]').forEach(function (l) { l.classList.remove("pick"); });
-        lab.classList.add("pick");
-        var input = lab.querySelector("input");
-        if (input) input.checked = true;
-      });
-    });
-
-    var actions = document.createElement("div");
-    actions.className = "form-actions";
-    actions.style.marginTop = "22px";
-    actions.innerHTML = '<button class="btn" id="submit-btn">Submit &amp; score</button>' +
-      '<button class="btn ghost" id="retake-btn" style="display:none">Retake</button>';
-    takeBody.appendChild(actions);
-
-    document.getElementById("submit-btn").addEventListener("click", grade);
-    document.getElementById("retake-btn").addEventListener("click", renderTake);
-  }
-
-  function grade() {
-    if (submitted) return;
-    submitted = true;
-    var correct = 0;
-    state.questions.forEach(function (item, idx) {
-      var chosen = answers.hasOwnProperty(idx) ? answers[idx] : -1;
-      if (chosen === item.correct) correct++;
-      var card = document.getElementById("take-q-" + idx);
-      card.querySelectorAll(".take-opts label").forEach(function (lab) {
-        var i = +lab.getAttribute("data-i");
-        var input = lab.querySelector("input");
-        if (input) input.disabled = true;
-        lab.style.cursor = "default";
-        if (i === item.correct) {
-          lab.classList.add("reveal-correct");
-          lab.insertAdjacentHTML("beforeend", '<span class="verdict ok">correct</span>');
-        } else if (i === chosen) {
-          lab.classList.add("reveal-wrong");
-          lab.insertAdjacentHTML("beforeend", '<span class="verdict no">your answer</span>');
-        }
-      });
-    });
-
-    var total = state.questions.length;
-    var pct = Math.round((correct / total) * 100);
-    var msg = pct === 100 ? "Flawless — every base pair in place." :
-              pct >= 70 ? "Strong grasp of the genetic code." :
-              pct >= 40 ? "A solid start — review and try again." :
-              "Worth another pass through the helix.";
-    var slot = document.getElementById("score-slot");
-    slot.innerHTML =
-      '<div class="scorecard"><div class="score-ring" style="--pct:' + pct + '"><i>' + pct + '%</i></div>' +
-      '<div class="msg"><h2>' + correct + ' / ' + total + ' correct</h2><p>' + msg + '</p></div></div>';
-    slot.scrollIntoView({ behavior: "smooth", block: "start" });
-
-    var rt = document.getElementById("retake-btn");
-    var sb = document.getElementById("submit-btn");
-    if (rt) rt.style.display = "";
-    if (sb) sb.style.display = "none";
-  }
-
-  // ---------- tabs ----------
-  var tabBuild = document.getElementById("tab-build");
-  var tabTake = document.getElementById("tab-take");
-  function selectTab(which) {
-    var build = which === "build";
-    tabBuild.setAttribute("aria-selected", build);
-    tabTake.setAttribute("aria-selected", !build);
-    document.getElementById("panel-build").classList.toggle("active", build);
-    document.getElementById("panel-take").classList.toggle("active", !build);
-    if (!build) renderTake();
-  }
-  tabBuild.addEventListener("click", function () { selectTab("build"); });
-  tabTake.addEventListener("click", function () { selectTab("take"); });
-
-  renderBuild();
-
-  // ---------- animated double helix ----------
   var canvas = document.getElementById("helix");
+  if (!canvas) return;
   var ctx = canvas.getContext("2d");
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var pairColors = [["#38a169", "#e4572e"], ["#e0a422", "#2e7dd2"]]; // A-T, G-C
@@ -551,33 +178,33 @@
   window.addEventListener("resize", resize);
   resize();
 
-  function draw(t) {
-    ctx.clearRect(0, 0, W, H);
-    var mid = H / 2;
-    var amp = Math.min(H * 0.32, 60);
-    var rungs = Math.ceil(W / 34) + 2;
-    var phase = t * 0.0006;
-    for (var i = 0; i < rungs; i++) {
-      var x = i * 34;
-      var a = x * 0.035 + phase;
-      var y1 = mid + Math.sin(a) * amp;
-      var y2 = mid - Math.sin(a) * amp;
-      var depth = (Math.cos(a) + 1) / 2; // 0..1 for pseudo-3D fade
-      var pc = pairColors[i % 2];
-      ctx.globalAlpha = 0.25 + depth * 0.5;
-      ctx.strokeStyle = "#7fd6cf";
-      ctx.lineWidth = 1.4;
-      ctx.beginPath(); ctx.moveTo(x, y1); ctx.lineTo(x, y2); ctx.stroke();
-      // nodes
-      ctx.globalAlpha = 0.5 + depth * 0.5;
-      node(x, y1, pc[0], 3 + depth * 2.5);
-      node(x, y2, pc[1], 3 + depth * 2.5);
-    }
-    ctx.globalAlpha = 1;
-  }
   function node(x, y, color, r) {
     ctx.fillStyle = color;
     ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+  }
+  function draw(t) {
+    ctx.clearRect(0, 0, W, H);
+    var mid = H / 2;
+    var amp = Math.min(H * 0.30, 90);
+    var spacing = 30;
+    var rungs = Math.ceil(W / spacing) + 2;
+    var phase = t * 0.0005;
+    for (var i = 0; i < rungs; i++) {
+      var x = i * spacing;
+      var a = x * 0.032 + phase;
+      var y1 = mid + Math.sin(a) * amp;
+      var y2 = mid - Math.sin(a) * amp;
+      var depth = (Math.cos(a) + 1) / 2;
+      var pc = pairColors[i % 2];
+      ctx.globalAlpha = 0.18 + depth * 0.42;
+      ctx.strokeStyle = "#7fd6cf";
+      ctx.lineWidth = 1.3;
+      ctx.beginPath(); ctx.moveTo(x, y1); ctx.lineTo(x, y2); ctx.stroke();
+      ctx.globalAlpha = 0.45 + depth * 0.5;
+      node(x, y1, pc[0], 2.5 + depth * 3);
+      node(x, y2, pc[1], 2.5 + depth * 3);
+    }
+    ctx.globalAlpha = 1;
   }
 
   if (reduce) {
