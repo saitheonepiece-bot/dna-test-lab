@@ -210,6 +210,28 @@
   .verdict.ok { color: var(--good-line); }
   .verdict.no { color: var(--bad-line); }
 
+  /* ---- Timed one-at-a-time quiz ---- */
+  .quiz-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+  .q-progress { font-family: var(--mono); font-size: 13px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+  .q-progress b { color: var(--ink); font-size: 15px; }
+  .q-timer { font-family: var(--mono); font-weight: 800; font-size: 18px; color: var(--teal-dark); display: inline-flex; align-items: baseline; gap: 1px; transition: color .2s; }
+  .q-timer .timer-num { font-size: 22px; }
+  .q-timer.low { color: #dc2626; }
+  .timer-track { height: 9px; background: #e6edf5; border-radius: 999px; overflow: hidden; }
+  .timer-fill { height: 100%; width: 100%; border-radius: 999px; background: linear-gradient(90deg, #1cc8c8, #0e9d9d); }
+  .timer-fill.low { background: linear-gradient(90deg, #f59e0b, #dc2626); }
+  .quiz-card { margin-top: 16px; animation: qfade .28s ease; }
+  @keyframes qfade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .quiz-qtext { font-size: 20px; font-weight: 700; color: var(--ink); margin: 0 0 18px; line-height: 1.35; }
+  .quiz-opts { display: grid; gap: 10px; }
+  .quiz-opt { display: flex; align-items: center; gap: 12px; text-align: left; width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: 12px; background: #fbfdff; font-size: 16px; color: var(--text); cursor: pointer; font-family: var(--sans); transition: border-color .12s, background .12s; }
+  .quiz-opt:hover { border-color: var(--teal); background: #f0fbfa; }
+  .quiz-opt.pick { border-color: var(--teal); background: #e2f7f6; }
+  .quiz-opt .opt-key { width: 28px; height: 28px; flex-shrink: 0; display: grid; place-items: center; border-radius: 8px; background: #eaf1f6; font-weight: 800; font-family: var(--mono); font-size: 14px; color: var(--ink); transition: background .12s, color .12s; }
+  .quiz-opt.pick .opt-key { background: var(--teal); color: #fff; }
+  .quiz-opt:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+  .quiz-nav { margin-top: 20px; display: flex; justify-content: flex-end; }
+
   .scorecard {
     background: var(--ink); color: #fff; border-radius: 16px; padding: 26px 28px;
     margin-bottom: 22px; display: flex; align-items: center; gap: 26px; flex-wrap: wrap;
@@ -646,9 +668,22 @@
   }
 
   // ---------- take mode ----------
+  // ---------- timed, one-question-at-a-time take mode ----------
+  var QUIZ_TIME = 15; // seconds per question
+  var currentQ = 0;
+  var timerTimeout = null;
+  var timerInterval = null;
+
+  function clearQuizTimers() {
+    if (timerTimeout) { clearTimeout(timerTimeout); timerTimeout = null; }
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  }
+
   function renderTake() {
+    clearQuizTimers();
     submitted = false;
     answers = {};
+    currentQ = 0;
     takeBody.innerHTML = "";
     if (state.questions.length === 0) {
       takeBody.innerHTML = '<div class="card empty"><div class="seq" style="font-size:30px">📝</div>This test has no questions yet.<br>Switch to <strong>Build</strong> to add some.</div>';
@@ -657,92 +692,116 @@
     var titleWrap = document.createElement("div");
     titleWrap.className = "titlebar";
     titleWrap.innerHTML = '<h2 style="flex:1;font-size:26px;color:var(--ink)">' + esc(state.title) + '</h2>' +
-      '<span class="count-pill">' + state.questions.length + ' questions</span>';
+      '<span class="count-pill">⏱ ' + QUIZ_TIME + 's per question</span>';
     takeBody.appendChild(titleWrap);
 
-    var scoreSlot = document.createElement("div");
-    scoreSlot.id = "score-slot";
-    takeBody.appendChild(scoreSlot);
+    var stage = document.createElement("div");
+    stage.id = "quiz-stage";
+    takeBody.appendChild(stage);
 
-    state.questions.forEach(function (item, idx) {
-      var card = document.createElement("div");
-      card.className = "card";
-      card.id = "take-q-" + idx;
-      var opts = item.options.map(function (o, i) {
-        if (!o) return "";
-        return '<li><label data-q="' + idx + '" data-i="' + i + '">' +
-          '<input type="radio" name="take-' + idx + '" value="' + i + '">' +
-          '<span>' + esc(o) + "</span></label></li>";
-      }).join("");
-      card.innerHTML =
-        '<div class="q-head"><span class="q-num">' + (idx + 1) + '</span>' +
-        '<span class="q-text">' + esc(item.q) + "</span></div>" +
-        '<ul class="take-opts">' + opts + "</ul>";
-      takeBody.appendChild(card);
-    });
-
-    takeBody.querySelectorAll(".take-opts label").forEach(function (lab) {
-      lab.addEventListener("click", function () {
-        if (submitted) return;
-        var qi = +lab.getAttribute("data-q");
-        answers[qi] = +lab.getAttribute("data-i");
-        takeBody.querySelectorAll('[data-q="' + qi + '"]').forEach(function (l) { l.classList.remove("pick"); });
-        lab.classList.add("pick");
-        var input = lab.querySelector("input");
-        if (input) input.checked = true;
-      });
-    });
-
-    var actions = document.createElement("div");
-    actions.className = "form-actions";
-    actions.style.marginTop = "22px";
-    actions.innerHTML = '<button class="btn" id="submit-btn">Submit &amp; score</button>' +
-      '<button class="btn ghost" id="retake-btn" style="display:none">Retake</button>';
-    takeBody.appendChild(actions);
-
-    document.getElementById("submit-btn").addEventListener("click", grade);
-    document.getElementById("retake-btn").addEventListener("click", renderTake);
+    showQuestion(0);
   }
 
-  function grade() {
-    if (submitted) return;
-    submitted = true;
-    var correct = 0;
-    state.questions.forEach(function (item, idx) {
-      var chosen = answers.hasOwnProperty(idx) ? answers[idx] : -1;
-      if (chosen === item.correct) correct++;
-      var card = document.getElementById("take-q-" + idx);
-      card.querySelectorAll(".take-opts label").forEach(function (lab) {
-        var i = +lab.getAttribute("data-i");
-        var input = lab.querySelector("input");
-        if (input) input.disabled = true;
-        lab.style.cursor = "default";
-        if (i === item.correct) {
-          lab.classList.add("reveal-correct");
-          lab.insertAdjacentHTML("beforeend", '<span class="verdict ok">correct</span>');
-        } else if (i === chosen) {
-          lab.classList.add("reveal-wrong");
-          lab.insertAdjacentHTML("beforeend", '<span class="verdict no">your answer</span>');
-        }
+  function showQuestion(i) {
+    clearQuizTimers();
+    currentQ = i;
+    var item = state.questions[i];
+    var total = state.questions.length;
+    var lastQ = i === total - 1;
+    var optHtml = item.options.map(function (o, idx) {
+      if (!o) return "";
+      var picked = answers[i] === idx ? " pick" : "";
+      return '<button type="button" class="quiz-opt' + picked + '" data-i="' + idx + '">' +
+        '<span class="opt-key">' + LETTERS[idx] + '</span><span>' + esc(o) + '</span></button>';
+    }).join("");
+
+    var stage = document.getElementById("quiz-stage");
+    stage.innerHTML =
+      '<div class="quiz-top">' +
+        '<span class="q-progress">Question <b>' + (i + 1) + '</b> of ' + total + '</span>' +
+        '<span class="q-timer" id="q-timer"><span class="timer-num" id="t-num">' + QUIZ_TIME + '</span>s</span>' +
+      '</div>' +
+      '<div class="timer-track"><div class="timer-fill" id="t-bar"></div></div>' +
+      '<div class="card quiz-card"><p class="quiz-qtext">' + esc(item.q) + '</p>' +
+        '<div class="quiz-opts">' + optHtml + '</div></div>' +
+      '<div class="quiz-nav"><button class="btn" id="next-btn">' + (lastQ ? "Finish" : "Next") + ' &rarr;</button></div>';
+
+    stage.querySelectorAll(".quiz-opt").forEach(function (b) {
+      b.addEventListener("click", function () {
+        answers[i] = +b.getAttribute("data-i");
+        stage.querySelectorAll(".quiz-opt").forEach(function (x) { x.classList.remove("pick"); });
+        b.classList.add("pick");
       });
     });
+    document.getElementById("next-btn").addEventListener("click", advance);
+    startTimer();
+  }
 
-    var total = state.questions.length;
+  function advance() {
+    clearQuizTimers();
+    if (currentQ < state.questions.length - 1) showQuestion(currentQ + 1);
+    else finishQuiz();
+  }
+
+  function startTimer() {
+    var secs = QUIZ_TIME;
+    var numEl = document.getElementById("t-num");
+    var barEl = document.getElementById("t-bar");
+    var wrapEl = document.getElementById("q-timer");
+    // animate the bar from full to empty over QUIZ_TIME seconds
+    barEl.style.transition = "none";
+    barEl.style.width = "100%";
+    void barEl.offsetWidth; // force reflow so the transition runs
+    barEl.style.transition = "width " + QUIZ_TIME + "s linear";
+    barEl.style.width = "0%";
+    timerInterval = setInterval(function () {
+      secs--;
+      if (numEl) numEl.textContent = secs > 0 ? secs : 0;
+      if (secs <= 5) {
+        if (wrapEl) wrapEl.classList.add("low");
+        if (barEl) barEl.classList.add("low");
+      }
+      if (secs <= 0) { clearInterval(timerInterval); timerInterval = null; }
+    }, 1000);
+    timerTimeout = setTimeout(advance, QUIZ_TIME * 1000);
+  }
+
+  function finishQuiz() {
+    clearQuizTimers();
+    submitted = true;
+    var total = state.questions.length, correct = 0;
+    state.questions.forEach(function (item, idx) {
+      if (answers[idx] === item.correct) correct++;
+    });
     var pct = Math.round((correct / total) * 100);
-    var msg = pct === 100 ? "Flawless — every base pair in place." :
-              pct >= 70 ? "Strong grasp of the genetic code." :
-              pct >= 40 ? "A solid start — review and try again." :
-              "Worth another pass through the helix.";
-    var slot = document.getElementById("score-slot");
-    slot.innerHTML =
-      '<div class="scorecard"><div class="score-ring" style="--pct:' + pct + '"><i>' + pct + '%</i></div>' +
-      '<div class="msg"><h2>' + correct + ' / ' + total + ' correct</h2><p>' + msg + '</p></div></div>';
-    slot.scrollIntoView({ behavior: "smooth", block: "start" });
+    var msg = pct === 100 ? "Perfect score! 🎉 Nailed every one." :
+              pct >= 70 ? "Great job — you really know this!" :
+              pct >= 40 ? "Nice effort — review below and try again." :
+              "Good try — check the answers below and go again.";
 
-    var rt = document.getElementById("retake-btn");
-    var sb = document.getElementById("submit-btn");
-    if (rt) rt.style.display = "";
-    if (sb) sb.style.display = "none";
+    var review = state.questions.map(function (item, idx) {
+      var chosen = answers.hasOwnProperty(idx) ? answers[idx] : -1;
+      var opts = item.options.map(function (o, i) {
+        if (!o) return "";
+        var s = "display:flex;gap:10px;align-items:center;padding:10px 14px;border:1px solid var(--border);border-radius:9px;margin:6px 0;font-size:15px;";
+        var tag = "";
+        if (i === item.correct) { s += "background:var(--good-bg);border-color:var(--good-line);color:#1f6b3f;font-weight:600;"; tag = '<span class="verdict ok" style="margin-left:auto">correct</span>'; }
+        else if (i === chosen) { s += "background:var(--bad-bg);border-color:var(--bad-line);color:#9a2a1a;"; tag = '<span class="verdict no" style="margin-left:auto">your answer</span>'; }
+        return '<li style="' + s + '">' + esc(o) + tag + '</li>';
+      }).join("");
+      return '<div class="card"><div class="q-head"><span class="q-num">' + (idx + 1) + '</span>' +
+        '<span class="q-text">' + esc(item.q) + '</span></div>' +
+        '<ul class="take-opts" style="padding-left:42px;list-style:none">' + opts + '</ul></div>';
+    }).join("");
+
+    takeBody.innerHTML =
+      '<div class="scorecard"><div class="score-ring" style="--pct:' + pct + '"><i>' + pct + '%</i></div>' +
+      '<div class="msg"><h2>' + correct + ' / ' + total + ' correct</h2><p>' + msg + '</p></div></div>' +
+      '<h3 style="font-family:var(--serif);color:var(--ink);margin:26px 0 6px;font-size:22px">Review your answers</h3>' +
+      review +
+      '<div class="form-actions" style="margin-top:22px"><button class="btn" id="retake-btn">Try again</button></div>';
+    document.getElementById("retake-btn").addEventListener("click", renderTake);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   // ---------- tabs ----------
@@ -751,6 +810,7 @@
   function selectTab(which) {
     var build = which === "build";
     currentTab = which;
+    clearQuizTimers();
     tabBuild.setAttribute("aria-selected", build);
     tabTake.setAttribute("aria-selected", !build);
     document.getElementById("panel-build").classList.toggle("active", build);
