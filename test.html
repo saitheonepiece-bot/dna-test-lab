@@ -5,8 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>QuizGen AI — Take a Test</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%23eef4ff'/><rect x='9' y='13' width='46' height='38' rx='14' fill='%231b2a4a'/><rect x='4' y='26' width='5' height='12' rx='2.5' fill='%231b2a4a'/><rect x='55' y='26' width='5' height='12' rx='2.5' fill='%231b2a4a'/><line x1='32' y1='13' x2='32' y2='6' stroke='%231b2a4a' stroke-width='2.6'/><circle cx='32' cy='5' r='3' fill='%2334d399'/><ellipse cx='25' cy='32' rx='5.4' ry='6.4' fill='%231cc8c8'/><ellipse cx='39' cy='32' rx='5.4' ry='6.4' fill='%231cc8c8'/></svg>">
+<script>(function(){try{var s=localStorage.getItem('qg-theme');var d=s?s==='dark':(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){}})();</script>
 </head>
 <body>
+<button class="theme-toggle" id="theme-toggle" role="switch" aria-label="Toggle light and dark mode" title="Light / dark mode">
+  <span class="tt-thumb"><span class="tt-i sun" aria-hidden="true">☀</span><span class="tt-i moon" aria-hidden="true">☾</span></span>
+</button>
 <style>
   :root {
     --ink: #0e2440;
@@ -16,6 +20,8 @@
     --amber-d: #f59e0b;
     --amber-l: #fcd34d;
     --card: #ffffff;
+    --field: #f4f8fc;
+    --field-2: #e8eef6;
     --border: #d3e0f5;
     --text: #16233d;
     --muted: #5a6b8c;
@@ -25,17 +31,44 @@
     --T: #f43f5e;
     --G: #f59e0b;
     --C: #38bdf8;
-    --good-bg: #e6f4ec;
+    --good-bg: rgba(56,161,105,.14);
     --good-line: #38a169;
-    --bad-bg: #fcece7;
+    --bad-bg: rgba(228,87,46,.14);
     --bad-line: #e4572e;
     --serif: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
     --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace;
     --shadow: 0 1px 2px rgba(19,32,41,.05), 0 6px 20px rgba(19,32,41,.06);
   }
+  [data-theme="dark"] {
+    --ink: #eef4ff;
+    --paper: #0a1120;
+    --card: #151f38;
+    --field: #101a30;
+    --field-2: #1e2a45;
+    --border: #29344f;
+    --text: #dfe8f6;
+    --muted: #9aa8c6;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 14px 40px rgba(0,0,0,.4);
+  }
 
   * { box-sizing: border-box; }
+  body, .card, .builder, .tabs, .tab, .titlebar input, textarea, .q-opts li,
+  .take-opts label, .quiz-opt, .opt-key, .icon-btn, .count-pill, .timer-track {
+    transition: background-color .35s ease, border-color .35s ease, color .35s ease;
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+  /* theme toggle */
+  .theme-toggle { position: fixed; top: 14px; right: 14px; z-index: 60; width: 60px; height: 30px; border-radius: 999px; border: 1px solid var(--border); background: var(--card); box-shadow: var(--shadow); cursor: pointer; padding: 0; transition: background-color .35s ease, border-color .35s ease; }
+  .theme-toggle:focus-visible { outline: 3px solid var(--teal); outline-offset: 2px; }
+  .tt-thumb { position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(180deg, #fcd34d, #f59e0b); display: grid; place-items: center; box-shadow: 0 2px 6px rgba(0,0,0,.3); transition: transform .4s cubic-bezier(.34,1.56,.5,1), background .35s ease; }
+  [data-theme="dark"] .tt-thumb { transform: translateX(30px); background: linear-gradient(180deg, #5fe3e0, #1cc8c8); }
+  .tt-i { position: absolute; font-size: 14px; line-height: 1; transition: opacity .3s ease, transform .4s ease; }
+  .tt-i.sun { opacity: 1; transform: rotate(0); }
+  .tt-i.moon { opacity: 0; transform: rotate(-90deg); }
+  [data-theme="dark"] .tt-i.sun { opacity: 0; transform: rotate(90deg); }
+  [data-theme="dark"] .tt-i.moon { opacity: 1; transform: rotate(0); }
   body {
     margin: 0;
     background: var(--paper);
@@ -61,7 +94,7 @@
     position: relative;
     max-width: 900px;
     margin: 0 auto;
-    padding: 40px 24px 34px;
+    padding: 54px 24px 34px;
   }
   .home-link {
     display: inline-block;
@@ -100,7 +133,7 @@
   .tabs {
     display: flex;
     gap: 4px;
-    background: #e7edeb;
+    background: var(--field-2);
     padding: 5px;
     border-radius: 12px;
     margin: -26px auto 26px;
@@ -135,7 +168,7 @@
   .titlebar input:focus { outline: none; border-bottom-color: var(--teal); }
   .count-pill {
     font-family: var(--mono); font-size: 12px; color: var(--teal-dark);
-    background: #e2f7f6; border: 1px solid #bfeceb; padding: 4px 10px; border-radius: 999px;
+    background: rgba(28,200,200,.16); border: 1px solid #bfeceb; padding: 4px 10px; border-radius: 999px;
     white-space: nowrap;
   }
 
@@ -154,14 +187,14 @@
   .q-opts { list-style: none; margin: 14px 0 0; padding: 0 0 0 42px; display: grid; gap: 8px; }
   .q-opts li {
     padding: 9px 14px; border: 1px solid var(--border); border-radius: 9px;
-    font-size: 15px; color: var(--text); background: #fbfdfc; display: flex; gap: 10px; align-items: center;
+    font-size: 15px; color: var(--text); background: var(--field); display: flex; gap: 10px; align-items: center;
   }
-  .q-opts li.correct { background: var(--good-bg); border-color: var(--good-line); color: #1f5d3b; font-weight: 600; }
+  .q-opts li.correct { background: var(--good-bg); border-color: var(--good-line); color: var(--good-line); font-weight: 600; }
   .q-opts li .mark { font-family: var(--mono); font-size: 12px; color: var(--muted); font-weight: 700; }
   .q-opts li.correct .mark { color: var(--good-line); }
   .row-actions { display: flex; gap: 8px; margin-top: 6px; }
   .icon-btn {
-    border: 1px solid var(--border); background: #fff; color: var(--muted);
+    border: 1px solid var(--border); background: var(--card); color: var(--muted);
     border-radius: 8px; padding: 5px 12px; font-size: 13px; font-weight: 600;
   }
   .icon-btn:hover { border-color: var(--bad-line); color: var(--bad-line); }
@@ -174,7 +207,7 @@
   label.fld { display: block; font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 6px; letter-spacing: .01em; }
   .builder textarea, .builder .opt-in input[type="text"] {
     width: 100%; border: 1px solid var(--border); border-radius: 9px; padding: 10px 12px;
-    font-size: 15px; background: #fbfdfc; color: var(--text); resize: vertical;
+    font-size: 15px; background: var(--field); color: var(--text); resize: vertical;
   }
   .builder textarea:focus, .builder .opt-in input:focus { outline: 2px solid var(--teal); outline-offset: -1px; border-color: var(--teal); }
   .opt-grid { display: grid; gap: 10px; margin: 6px 0 4px; }
@@ -191,19 +224,19 @@
   .btn:active { transform: translateY(1px); }
   .btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
   .btn.ghost { background: transparent; color: var(--teal-dark); border: 1px solid var(--teal); box-shadow: none; }
-  .btn.ghost:hover { background: #e2f7f6; }
+  .btn.ghost:hover { background: rgba(28,200,200,.16); }
   .form-actions { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
 
   /* ---- Take mode ---- */
   .take-opts { list-style: none; margin: 14px 0 0; padding: 0 0 0 42px; display: grid; gap: 8px; }
   .take-opts label {
     display: flex; gap: 11px; align-items: center; padding: 11px 14px;
-    border: 1px solid var(--border); border-radius: 9px; cursor: pointer; background: #fbfdfc;
+    border: 1px solid var(--border); border-radius: 9px; cursor: pointer; background: var(--field);
     font-size: 15px; transition: border-color .14s, background .14s;
   }
-  .take-opts label:hover { border-color: var(--teal); background: #f0fbfa; }
+  .take-opts label:hover { border-color: var(--teal); background: rgba(28,200,200,.10); }
   .take-opts input { accent-color: var(--teal); width: 17px; height: 17px; }
-  .take-opts label.pick { border-color: var(--teal); background: #e2f7f6; }
+  .take-opts label.pick { border-color: var(--teal); background: rgba(28,200,200,.16); }
   .take-opts label.reveal-correct { background: var(--good-bg); border-color: var(--good-line); }
   .take-opts label.reveal-wrong { background: var(--bad-bg); border-color: var(--bad-line); }
   .verdict { font-family: var(--mono); font-size: 12px; font-weight: 700; margin-left: auto; }
@@ -217,23 +250,23 @@
   .q-timer { font-family: var(--mono); font-weight: 800; font-size: 18px; color: var(--teal-dark); display: inline-flex; align-items: baseline; gap: 1px; transition: color .2s; }
   .q-timer .timer-num { font-size: 22px; }
   .q-timer.low { color: #dc2626; }
-  .timer-track { height: 9px; background: #e6edf5; border-radius: 999px; overflow: hidden; }
+  .timer-track { height: 9px; background: var(--field-2); border-radius: 999px; overflow: hidden; }
   .timer-fill { height: 100%; width: 100%; border-radius: 999px; background: linear-gradient(90deg, #1cc8c8, #0e9d9d); }
   .timer-fill.low { background: linear-gradient(90deg, #f59e0b, #dc2626); }
   .quiz-card { margin-top: 16px; animation: qfade .28s ease; }
   @keyframes qfade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
   .quiz-qtext { font-size: 20px; font-weight: 700; color: var(--ink); margin: 0 0 18px; line-height: 1.35; }
   .quiz-opts { display: grid; gap: 10px; }
-  .quiz-opt { display: flex; align-items: center; gap: 12px; text-align: left; width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: 12px; background: #fbfdff; font-size: 16px; color: var(--text); cursor: pointer; font-family: var(--sans); transition: border-color .12s, background .12s; }
-  .quiz-opt:hover { border-color: var(--teal); background: #f0fbfa; }
-  .quiz-opt.pick { border-color: var(--teal); background: #e2f7f6; }
-  .quiz-opt .opt-key { width: 28px; height: 28px; flex-shrink: 0; display: grid; place-items: center; border-radius: 8px; background: #eaf1f6; font-weight: 800; font-family: var(--mono); font-size: 14px; color: var(--ink); transition: background .12s, color .12s; }
+  .quiz-opt { display: flex; align-items: center; gap: 12px; text-align: left; width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: 12px; background: var(--field); font-size: 16px; color: var(--text); cursor: pointer; font-family: var(--sans); transition: border-color .12s, background .12s; }
+  .quiz-opt:hover { border-color: var(--teal); background: rgba(28,200,200,.10); }
+  .quiz-opt.pick { border-color: var(--teal); background: rgba(28,200,200,.16); }
+  .quiz-opt .opt-key { width: 28px; height: 28px; flex-shrink: 0; display: grid; place-items: center; border-radius: 8px; background: var(--field-2); font-weight: 800; font-family: var(--mono); font-size: 14px; color: var(--ink); transition: background .12s, color .12s; }
   .quiz-opt.pick .opt-key { background: var(--teal); color: #fff; }
   .quiz-opt:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
   .quiz-nav { margin-top: 20px; display: flex; justify-content: flex-end; }
 
   .scorecard {
-    background: var(--ink); color: #fff; border-radius: 16px; padding: 26px 28px;
+    background: #0f2444; color: #fff; border-radius: 16px; padding: 26px 28px;
     margin-bottom: 22px; display: flex; align-items: center; gap: 26px; flex-wrap: wrap;
   }
   .score-ring {
@@ -243,7 +276,7 @@
     display: grid; place-items: center;
   }
   .score-ring i {
-    width: 70px; height: 70px; border-radius: 50%; background: var(--ink);
+    width: 70px; height: 70px; border-radius: 50%; background: #0f2444;
     display: grid; place-items: center; font-style: normal;
     font-family: var(--mono); font-size: 22px; font-weight: 700;
   }
@@ -266,7 +299,7 @@
   .switcher label { display: inline-flex; flex-direction: column; gap: 5px; font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #cfe0fb; }
   .switcher select {
     font-family: var(--sans); font-size: 15px; font-weight: 600; color: #0b1f47;
-    background: #fff; border: 0; border-radius: 10px; padding: 9px 14px; cursor: pointer;
+    background: var(--card); border: 0; border-radius: 10px; padding: 9px 14px; cursor: pointer;
     box-shadow: 0 3px 10px rgba(0,0,0,.18); min-width: 150px;
   }
   .switcher select:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
@@ -356,6 +389,23 @@
 </footer>
 
 <script>
+/* theme toggle */
+(function () {
+  var btn = document.getElementById("theme-toggle");
+  if (!btn) return;
+  function apply(dark) {
+    document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+    btn.setAttribute("aria-checked", dark ? "true" : "false");
+  }
+  var dark = document.documentElement.getAttribute("data-theme") === "dark";
+  apply(dark);
+  btn.addEventListener("click", function () {
+    dark = !dark;
+    apply(dark);
+    try { localStorage.setItem("qg-theme", dark ? "dark" : "light"); } catch (e) {}
+  });
+})();
+
 (function () {
   "use strict";
   var LETTERS = ["A", "B", "C", "D"];
@@ -785,8 +835,8 @@
         if (!o) return "";
         var s = "display:flex;gap:10px;align-items:center;padding:10px 14px;border:1px solid var(--border);border-radius:9px;margin:6px 0;font-size:15px;";
         var tag = "";
-        if (i === item.correct) { s += "background:var(--good-bg);border-color:var(--good-line);color:#1f6b3f;font-weight:600;"; tag = '<span class="verdict ok" style="margin-left:auto">correct</span>'; }
-        else if (i === chosen) { s += "background:var(--bad-bg);border-color:var(--bad-line);color:#9a2a1a;"; tag = '<span class="verdict no" style="margin-left:auto">your answer</span>'; }
+        if (i === item.correct) { s += "background:var(--good-bg);border-color:var(--good-line);color:var(--good-line);font-weight:600;"; tag = '<span class="verdict ok" style="margin-left:auto">correct</span>'; }
+        else if (i === chosen) { s += "background:var(--bad-bg);border-color:var(--bad-line);color:var(--bad-line);"; tag = '<span class="verdict no" style="margin-left:auto">your answer</span>'; }
         return '<li style="' + s + '">' + esc(o) + tag + '</li>';
       }).join("");
       return '<div class="card"><div class="q-head"><span class="q-num">' + (idx + 1) + '</span>' +

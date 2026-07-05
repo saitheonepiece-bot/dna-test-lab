@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>QuizGen AI — AI-Powered Quiz Generator</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%23eef4ff'/><rect x='9' y='13' width='46' height='38' rx='14' fill='%231b2a4a'/><rect x='4' y='26' width='5' height='12' rx='2.5' fill='%231b2a4a'/><rect x='55' y='26' width='5' height='12' rx='2.5' fill='%231b2a4a'/><line x1='32' y1='13' x2='32' y2='6' stroke='%231b2a4a' stroke-width='2.6'/><circle cx='32' cy='5' r='3' fill='%2334d399'/><ellipse cx='25' cy='32' rx='5.4' ry='6.4' fill='%231cc8c8'/><ellipse cx='39' cy='32' rx='5.4' ry='6.4' fill='%231cc8c8'/></svg>">
+<script>(function(){try{var s=localStorage.getItem('qg-theme');var d=s?s==='dark':(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){}})();</script>
 <script src="https://js.puter.com/v2/"></script>
 <style>
   :root {
@@ -21,6 +22,7 @@
     --violet-d: #0e9d9d;
     --paper: #f7f9fb;
     --card: #ffffff;
+    --field: #f4f8fc;
     --border: #d3e0f5;
     --text: #16233d;
     --muted: #5a6b8c;
@@ -32,7 +34,35 @@
     --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace;
     --shadow: 0 1px 2px rgba(11,31,71,.06), 0 14px 40px rgba(11,31,71,.12);
   }
+  [data-theme="dark"] {
+    --ink: #eef4ff;
+    --paper: #0a1120;
+    --card: #151f38;
+    --field: #101a30;
+    --border: #29344f;
+    --text: #dfe8f6;
+    --muted: #9aa8c6;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 14px 40px rgba(0,0,0,.45);
+  }
   * { box-sizing: border-box; }
+  /* smooth theme transition */
+  body, .creator-inner, .card, .step-card, .info-panel, .info-note, .topic-input,
+  .diff-btn, .chip, .dropzone, .dz-remove, footer, .brand-tag {
+    transition: background-color .35s ease, border-color .35s ease, color .35s ease;
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+  /* theme toggle */
+  .theme-toggle { position: fixed; top: 14px; right: 14px; z-index: 60; width: 60px; height: 30px; border-radius: 999px; border: 1px solid var(--border); background: var(--card); box-shadow: var(--shadow); cursor: pointer; padding: 0; transition: background-color .35s ease, border-color .35s ease; }
+  .theme-toggle:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+  .tt-thumb { position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(180deg, #fcd34d, #f59e0b); display: grid; place-items: center; box-shadow: 0 2px 6px rgba(0,0,0,.25); transition: transform .4s cubic-bezier(.34,1.56,.5,1), background .35s ease; }
+  [data-theme="dark"] .tt-thumb { transform: translateX(30px); background: linear-gradient(180deg, #5fe3e0, #1cc8c8); }
+  .tt-i { position: absolute; font-size: 14px; line-height: 1; transition: opacity .3s ease, transform .4s ease; }
+  .tt-i.sun { opacity: 1; transform: rotate(0); }
+  .tt-i.moon { opacity: 0; transform: rotate(-90deg); }
+  [data-theme="dark"] .tt-i.sun { opacity: 0; transform: rotate(90deg); }
+  [data-theme="dark"] .tt-i.moon { opacity: 1; transform: rotate(0); }
+
   html { scroll-behavior: smooth; }
   body { margin: 0; background: var(--paper); color: var(--text); font-family: var(--sans); line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
   h1, h2, h3 { font-family: var(--serif); font-weight: 600; text-wrap: balance; margin: 0; }
@@ -98,11 +128,11 @@
   .creator h2 { font-size: clamp(22px, 3.2vw, 30px); color: var(--ink); display: flex; align-items: center; gap: 10px; }
   .creator .sub { color: var(--muted); margin: 8px 0 22px; font-size: 15.5px; }
   .field-label { font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 8px; }
-  .topic-input { width: 100%; font-size: 18px; font-family: var(--sans); padding: 15px 18px; border: 2px solid var(--border); border-radius: 14px; background: #f7f9ff; color: var(--ink); transition: border-color .15s, box-shadow .15s; }
+  .topic-input { width: 100%; font-size: 18px; font-family: var(--sans); padding: 15px 18px; border: 2px solid var(--border); border-radius: 14px; background: var(--field); color: var(--ink); transition: border-color .15s, box-shadow .15s; }
   .topic-input:focus { outline: none; border-color: var(--violet); box-shadow: 0 0 0 4px rgba(28,200,200,.18); }
   .controls { display: grid; grid-template-columns: 1fr 1.3fr; gap: 22px; margin: 20px 0 6px; }
   .diff-row { display: flex; gap: 8px; }
-  .diff-btn { flex: 1; padding: 11px 6px; border: 2px solid var(--border); background: #f7f9ff; border-radius: 12px; font-weight: 700; font-size: 14px; color: var(--muted); cursor: pointer; font-family: var(--sans); transition: all .14s; }
+  .diff-btn { flex: 1; padding: 11px 6px; border: 2px solid var(--border); background: var(--field); border-radius: 12px; font-weight: 700; font-size: 14px; color: var(--muted); cursor: pointer; font-family: var(--sans); transition: all .14s; }
   .diff-btn:hover { border-color: var(--amber-d); }
   .diff-btn.active { background: linear-gradient(180deg, #fcd34d, #f59e0b); color: #0e2440; border-color: transparent; box-shadow: 0 4px 12px rgba(245,158,11,.35); }
   .diff-btn:focus-visible { outline: 2px solid var(--violet); outline-offset: 2px; }
@@ -119,14 +149,14 @@
   .gen-status.ok { color: #16a34a; font-weight: 600; }
   .example-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; align-items: center; }
   .example-chips .lbl { font-size: 13px; color: var(--muted); }
-  .chip { font-size: 13px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--border); background: #f7f9ff; color: var(--ink); cursor: pointer; transition: all .14s; }
-  .chip:hover { border-color: var(--violet); background: #e6faf9; }
+  .chip { font-size: 13px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--border); background: var(--field); color: var(--ink); cursor: pointer; transition: all .14s; }
+  .chip:hover { border-color: var(--violet); background: rgba(28,200,200,.14); }
 
   .or-divider { display: flex; align-items: center; gap: 12px; margin: 22px 0 14px; color: var(--muted); font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
   .or-divider::before, .or-divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
   .opt-tag { font-family: var(--mono); font-size: 9.5px; letter-spacing: .08em; color: var(--amber-d); background: #fff6e0; border: 1px solid #fde9b8; padding: 2px 7px; border-radius: 999px; text-transform: uppercase; margin-left: 6px; }
-  .dropzone { border: 2px dashed #bcd0da; border-radius: 16px; background: #f6fbfd; padding: 22px; text-align: center; cursor: pointer; transition: border-color .14s, background .14s; }
-  .dropzone:hover, .dropzone.drag { border-color: var(--blue); background: #ecfafa; }
+  .dropzone { border: 2px dashed var(--border); border-radius: 16px; background: var(--field); padding: 22px; text-align: center; cursor: pointer; transition: border-color .14s, background .14s; }
+  .dropzone:hover, .dropzone.drag { border-color: var(--blue); background: rgba(28,200,200,.12); }
   .dropzone:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
   .dz-empty { display: flex; flex-direction: column; align-items: center; gap: 5px; pointer-events: none; }
   .dz-icon { font-size: 32px; }
@@ -135,7 +165,7 @@
   .dz-preview { display: flex; flex-direction: column; align-items: center; gap: 12px; }
   .dz-preview img { max-width: 100%; max-height: 240px; border-radius: 12px; box-shadow: var(--shadow); }
   .dz-meta { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--muted); }
-  .dz-remove { border: 1px solid var(--border); background: #fff; color: #dc2626; border-radius: 8px; padding: 5px 12px; font-weight: 700; font-size: 13px; cursor: pointer; font-family: var(--sans); }
+  .dz-remove { border: 1px solid var(--border); background: var(--card); color: #dc2626; border-radius: 8px; padding: 5px 12px; font-weight: 700; font-size: 13px; cursor: pointer; font-family: var(--sans); }
   .dz-remove:hover { border-color: #dc2626; background: #fef2f2; }
 
   /* ---------- Subject picker ---------- */
@@ -163,13 +193,13 @@
   .step-card p { margin: 0; color: var(--muted); font-size: 15px; }
   .behind { text-align: center; color: var(--muted); max-width: 62ch; margin: 26px auto 0; font-size: 15.5px; }
 
-  .info-panel { margin: 30px auto 0; max-width: 780px; background: #ffffff; border: 1px solid var(--border); border-left: 5px solid var(--blue); border-radius: 18px; padding: 30px 30px; box-shadow: var(--shadow); }
+  .info-panel { margin: 30px auto 0; max-width: 780px; background: var(--card); border: 1px solid var(--border); border-left: 5px solid var(--blue); border-radius: 18px; padding: 30px 30px; box-shadow: var(--shadow); }
   .info-panel h3 { font-size: 22px; color: var(--ink); }
   .info-panel > p { color: var(--text); margin: 12px 0 0; font-size: 15.5px; }
   .info-list { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 12px; }
   .info-list li { position: relative; padding-left: 30px; color: var(--text); font-size: 15.5px; }
   .info-list li::before { content: "✓"; position: absolute; left: 0; top: 0; color: #16a34a; font-weight: 800; font-size: 16px; }
-  .info-note { margin-top: 20px; font-size: 14.5px; line-height: 1.55; color: var(--muted); background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 15px 17px; }
+  .info-note { margin-top: 20px; font-size: 14.5px; line-height: 1.55; color: var(--muted); background: var(--field); border: 1px solid var(--border); border-radius: 14px; padding: 15px 17px; }
 
   .final-cta { text-align: center; padding: 70px 0 40px; }
   .final-cta .emoji { font-size: 44px; }
@@ -191,6 +221,10 @@
 </style>
 </head>
 <body>
+
+<button class="theme-toggle" id="theme-toggle" role="switch" aria-label="Toggle light and dark mode" title="Light / dark mode">
+  <span class="tt-thumb"><span class="tt-i sun" aria-hidden="true">☀</span><span class="tt-i moon" aria-hidden="true">☾</span></span>
+</button>
 
 <header class="hero" id="top">
   <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
@@ -356,6 +390,23 @@
 </footer>
 
 <script>
+/* ---------------- theme toggle ---------------- */
+(function () {
+  var btn = document.getElementById("theme-toggle");
+  if (!btn) return;
+  function apply(dark) {
+    document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+    btn.setAttribute("aria-checked", dark ? "true" : "false");
+  }
+  var dark = document.documentElement.getAttribute("data-theme") === "dark";
+  apply(dark);
+  btn.addEventListener("click", function () {
+    dark = !dark;
+    apply(dark);
+    try { localStorage.setItem("qg-theme", dark ? "dark" : "light"); } catch (e) {}
+  });
+})();
+
 /* ---------------- AI quiz generator ---------------- */
 (function () {
   "use strict";
