@@ -1,4 +1,4 @@
-# ⚡ Spark Quiz Lab
+# ⚡ QuizGen AI
 
 Make a quiz on **any topic** with built-in AI — plus ready-made science quizzes for grades 6–9. No sign-up, no API keys, no cost. Runs as plain files on GitHub Pages.
 
