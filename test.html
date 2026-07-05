@@ -9,9 +9,12 @@
 <body>
 <style>
   :root {
-    --ink: #0b1f47;
+    --ink: #0e2440;
     --ink-soft: #16305f;
-    --paper: #eef4ff;
+    --paper: #f7f9fb;
+    --amber: #fbbf24;
+    --amber-d: #f59e0b;
+    --amber-l: #fcd34d;
     --card: #ffffff;
     --border: #d3e0f5;
     --text: #16233d;
@@ -48,10 +51,10 @@
   /* ---- Header ---- */
   header {
     position: relative;
-    background: linear-gradient(135deg, #072a30 0%, #0c7378 55%, #1cc8c8 100%);
+    background: linear-gradient(135deg, #0c1f3c 0%, #123457 55%, #0e6f78 100%);
     color: #eef4f2;
     overflow: hidden;
-    border-bottom: 3px solid #5fe3e0;
+    border-bottom: 3px solid var(--amber);
   }
   #helix { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .6; }
   .head-inner {
@@ -180,11 +183,11 @@
   .opt-in .tag { font-family: var(--mono); font-size: 12px; color: var(--muted); width: 58px; flex-shrink: 0; }
   .radio-hint { font-size: 12px; color: var(--muted); margin: 0 0 14px; padding-left: 68px; }
   .btn {
-    background: var(--teal); color: #fff; border: 0; border-radius: 10px;
-    padding: 11px 20px; font-size: 15px; font-weight: 600; box-shadow: 0 2px 6px rgba(18,163,163,.28);
-    transition: background .16s, transform .08s;
+    background: linear-gradient(180deg, var(--amber-l), var(--amber-d)); color: #0e2440; border: 0; border-radius: 10px;
+    padding: 11px 20px; font-size: 15px; font-weight: 700; box-shadow: 0 3px 8px rgba(245,158,11,.35);
+    transition: filter .16s, transform .08s;
   }
-  .btn:hover { background: var(--teal-dark); }
+  .btn:hover { filter: brightness(1.05); }
   .btn:active { transform: translateY(1px); }
   .btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
   .btn.ghost { background: transparent; color: var(--teal-dark); border: 1px solid var(--teal); box-shadow: none; }
@@ -521,7 +524,7 @@
     currentGrade = null;
     KEY = "spark-custom-quiz";
     state = raw;
-    var meta = { name: raw.topic || "Custom Quiz", emoji: "✨", accent: "#1cc8c8", dark: "#0e9d9d", grad: "linear-gradient(135deg,#062a2e 0%,#0e9d9d 55%,#5fe3e0 100%)" };
+    var meta = { name: raw.topic || "Custom Quiz", emoji: "✨", accent: "#1cc8c8", dark: "#0e9d9d", grad: "linear-gradient(135deg,#0c1f3c 0%,#123457 55%,#0e6f78 100%)" };
     var sw = document.querySelector(".switcher");
     if (sw) sw.style.display = "none";
     document.getElementById("eyebrow").innerHTML = "✨ AI-generated quiz" + (raw.difficulty ? " &middot; " + esc(raw.difficulty) : "");
