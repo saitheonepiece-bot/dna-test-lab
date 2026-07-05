@@ -122,6 +122,22 @@
   .chip { font-size: 13px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--border); background: #f7f9ff; color: var(--ink); cursor: pointer; transition: all .14s; }
   .chip:hover { border-color: var(--violet); background: #e6faf9; }
 
+  .or-divider { display: flex; align-items: center; gap: 12px; margin: 22px 0 14px; color: var(--muted); font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
+  .or-divider::before, .or-divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+  .opt-tag { font-family: var(--mono); font-size: 9.5px; letter-spacing: .08em; color: var(--amber-d); background: #fff6e0; border: 1px solid #fde9b8; padding: 2px 7px; border-radius: 999px; text-transform: uppercase; margin-left: 6px; }
+  .dropzone { border: 2px dashed #bcd0da; border-radius: 16px; background: #f6fbfd; padding: 22px; text-align: center; cursor: pointer; transition: border-color .14s, background .14s; }
+  .dropzone:hover, .dropzone.drag { border-color: var(--blue); background: #ecfafa; }
+  .dropzone:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+  .dz-empty { display: flex; flex-direction: column; align-items: center; gap: 5px; pointer-events: none; }
+  .dz-icon { font-size: 32px; }
+  .dz-text { font-weight: 700; color: var(--ink); font-size: 15px; }
+  .dz-hint { font-size: 13px; color: var(--muted); max-width: 48ch; }
+  .dz-preview { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .dz-preview img { max-width: 100%; max-height: 240px; border-radius: 12px; box-shadow: var(--shadow); }
+  .dz-meta { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--muted); }
+  .dz-remove { border: 1px solid var(--border); background: #fff; color: #dc2626; border-radius: 8px; padding: 5px 12px; font-weight: 700; font-size: 13px; cursor: pointer; font-family: var(--sans); }
+  .dz-remove:hover { border-color: #dc2626; background: #fef2f2; }
+
   /* ---------- Subject picker ---------- */
   .subjects { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 40px; }
   .subj { position: relative; background: var(--card); border: 1px solid var(--border); border-radius: 22px; padding: 24px; box-shadow: var(--shadow); overflow: hidden; transition: transform .16s, box-shadow .16s; }
@@ -208,7 +224,7 @@
     <div>
       <span class="badge"><span class="pulse"></span>AI-powered · Free for everyone</span>
       <h1>Make a quiz on <span class="grad">anything</span></h1>
-      <p class="lede">Type any topic — the solar system, World War II, fractions, your favorite video game — and AI writes you a quiz in seconds. Pick how many questions and how hard. No sign-up, no cost. ⚡</p>
+      <p class="lede">Type any topic — or snap a picture of your notes — and AI writes you a quiz in seconds. Pick how many questions and how hard. No sign-up, no cost. ⚡</p>
       <div class="cta-row">
         <a class="btn btn-primary" href="#create">Create a quiz <span class="arrow" aria-hidden="true">&darr;</span></a>
         <a class="btn btn-ghost" href="#about">How it works</a>
@@ -230,7 +246,7 @@
     <div class="creator">
       <div class="creator-inner">
         <h2>✨ Create a quiz on any topic</h2>
-        <p class="sub">Type a topic, choose your settings, and let AI build the quiz. Then take it — or edit the questions yourself.</p>
+        <p class="sub">Type a topic <em>or add a picture</em>, choose your settings, and let AI build the quiz. Then take it — or edit the questions yourself.</p>
 
         <label class="field-label" for="topic">Topic</label>
         <input class="topic-input" id="topic" type="text" placeholder="e.g. The solar system, Ancient Egypt, photosynthesis…" autocomplete="off" />
@@ -242,6 +258,22 @@
           <button class="chip" type="button">Fractions</button>
           <button class="chip" type="button">The human heart</button>
           <button class="chip" type="button">Greek mythology</button>
+        </div>
+
+        <div class="or-divider"><span>and / or</span></div>
+
+        <label class="field-label">Add a picture <span class="opt-tag">optional</span></label>
+        <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Add a picture to quiz from">
+          <input type="file" id="img-input" accept="image/*" hidden>
+          <div class="dz-empty" id="dz-empty">
+            <span class="dz-icon" aria-hidden="true">📷</span>
+            <span class="dz-text">Tap to add a photo — or drag one here</span>
+            <span class="dz-hint">Notes, a diagram, a textbook page, or a scene. The AI reads the picture and quizzes you on what's in it.</span>
+          </div>
+          <div class="dz-preview" id="dz-preview" hidden>
+            <img id="dz-img" alt="Your uploaded picture">
+            <div class="dz-meta"><span id="dz-name">image</span><button type="button" class="dz-remove" id="dz-remove">Remove</button></div>
+          </div>
         </div>
 
         <div class="controls">
@@ -279,8 +311,8 @@
     <div class="steps">
       <div class="step-card">
         <span class="step-ic" aria-hidden="true">✍️</span>
-        <h3>1 · Type a topic</h3>
-        <p>Enter anything you'd like to be quizzed on — a school subject, a hobby, a book, a country. Then choose how many questions (5–10) and how hard.</p>
+        <h3>1 · Topic or picture</h3>
+        <p>Type anything you'd like to be quizzed on — or add a picture (notes, a diagram, a textbook page) and let the AI read it. Then pick how many questions (5–10) and how hard.</p>
       </div>
       <div class="step-card">
         <span class="step-ic" aria-hidden="true">🤖</span>
@@ -294,7 +326,7 @@
       </div>
     </div>
 
-    <p class="behind">Behind the scenes, QuizGen AI sends your topic to a free AI service, gets back the questions, and saves your quiz privately on your own device — so it's there when you come back.</p>
+    <p class="behind">Behind the scenes, QuizGen AI sends your topic — or the picture you add — to a free AI service, gets back the questions, and saves your quiz privately on your own device, so it's there when you come back.</p>
 
     <!-- Puter AI explanation -->
     <div class="info-panel">
@@ -304,7 +336,7 @@
         <li><strong>It's what makes the AI free.</strong> Instead of the website paying for every quiz, Puter ties the usage to your own free account. Everyday use costs you nothing.</li>
         <li><strong>No payment, ever.</strong> You're never asked for a credit card or any money — a free account is all it takes.</li>
         <li><strong>QuizGen AI never sees your login.</strong> You sign in to Puter directly, in their own secure popup. This website only receives the finished quiz — never your email or password.</li>
-        <li><strong>Only your topic is shared.</strong> The one thing sent to the AI is the topic you type. Your finished quizzes stay saved on your device, not on any server.</li>
+        <li><strong>Only what you provide is shared.</strong> The AI only receives the topic you type or the picture you add — nothing else. Your finished quizzes stay saved on your device, not on any server.</li>
         <li><strong>You stay in control.</strong> Don't want to sign in? Just close the popup — you simply won't get an AI quiz that time. Nothing gets installed on your computer.</li>
       </ul>
       <p class="info-note"><strong>Simple guidelines:</strong> only ever sign in through the official Puter popup (never type a Puter password into any other box), you can use any email you like, and normal everyday use is free. Puter is a real, established company that provides free cloud and AI tools for websites like this one — it is not a virus, a scam, or anything harmful.</p>
@@ -314,7 +346,7 @@
   <section class="final-cta">
     <div class="emoji" aria-hidden="true">🧠✨</div>
     <h2>What will you quiz yourself on?</h2>
-    <p>Type any topic above and get a quiz in seconds — no sign-up, no cost.</p>
+    <p>Type a topic or add a picture above and get a quiz in seconds — no sign-up, no cost.</p>
     <a class="btn btn-primary" href="#create">Create a quiz <span class="arrow" aria-hidden="true">&darr;</span></a>
   </section>
 </main>
@@ -349,6 +381,78 @@
     c.addEventListener("click", function () { topicEl.value = c.textContent; topicEl.focus(); });
   });
 
+  // ---------- image upload (vision) ----------
+  var attachedImage = null; // scaled data URL of the added picture
+  var dropzone = document.getElementById("dropzone");
+  var imgInput = document.getElementById("img-input");
+  var dzEmpty = document.getElementById("dz-empty");
+  var dzPreview = document.getElementById("dz-preview");
+  var dzImg = document.getElementById("dz-img");
+  var dzName = document.getElementById("dz-name");
+  var dzRemove = document.getElementById("dz-remove");
+
+  dropzone.addEventListener("click", function () { imgInput.click(); });
+  dropzone.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); imgInput.click(); } });
+  imgInput.addEventListener("change", function () { if (imgInput.files && imgInput.files[0]) handleFile(imgInput.files[0]); });
+  ["dragenter", "dragover"].forEach(function (ev) {
+    dropzone.addEventListener(ev, function (e) { e.preventDefault(); dropzone.classList.add("drag"); });
+  });
+  ["dragleave", "drop"].forEach(function (ev) {
+    dropzone.addEventListener(ev, function (e) { e.preventDefault(); dropzone.classList.remove("drag"); });
+  });
+  dropzone.addEventListener("drop", function (e) {
+    var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) handleFile(f);
+  });
+  dzRemove.addEventListener("click", function (e) { e.stopPropagation(); clearImage(); });
+
+  function clearImage() {
+    attachedImage = null;
+    imgInput.value = "";
+    dzImg.removeAttribute("src");
+    dzPreview.hidden = true;
+    dzEmpty.hidden = false;
+    setStatus("");
+  }
+
+  function handleFile(file) {
+    if (!file.type || file.type.indexOf("image/") !== 0) {
+      setStatus("That file isn't an image — please choose a photo (JPG, PNG, etc.).", "err");
+      return;
+    }
+    setStatus("Loading your picture…", "");
+    scaleImage(file, 1280, function (dataUrl) {
+      if (!dataUrl) { setStatus("Couldn't read that image — try a different one.", "err"); return; }
+      attachedImage = dataUrl;
+      dzImg.src = dataUrl;
+      dzName.textContent = file.name ? (file.name.length > 28 ? file.name.slice(0, 25) + "…" : file.name) : "your picture";
+      dzEmpty.hidden = true;
+      dzPreview.hidden = false;
+      setStatus("Picture added — set your options and hit Generate.", "ok");
+    });
+  }
+
+  // Downscale + re-encode so the upload is small and fast
+  function scaleImage(file, maxDim, cb) {
+    var img = new Image();
+    img.onload = function () {
+      var w = img.width, h = img.height;
+      var scale = Math.min(1, maxDim / Math.max(w, h));
+      var cw = Math.max(1, Math.round(w * scale)), ch = Math.max(1, Math.round(h * scale));
+      var canvas = document.createElement("canvas");
+      canvas.width = cw; canvas.height = ch;
+      try {
+        canvas.getContext("2d").drawImage(img, 0, 0, cw, ch);
+        cb(canvas.toDataURL("image/jpeg", 0.85));
+      } catch (e) { cb(null); }
+    };
+    img.onerror = function () { cb(null); };
+    var fr = new FileReader();
+    fr.onload = function () { img.src = fr.result; };
+    fr.onerror = function () { cb(null); };
+    fr.readAsDataURL(file);
+  }
+
   function setStatus(msg, kind) { statusEl.textContent = msg || ""; statusEl.className = "gen-status" + (kind ? " " + kind : ""); }
 
   function extractText(r) {
@@ -374,6 +478,31 @@
       } catch (e) { /* try the next model */ }
     }
     throw new Error("AI unavailable");
+  }
+
+  // Vision: ask the AI about an image (with an OCR fallback for text-heavy pictures)
+  async function askAIVision(prompt, imageURL) {
+    var models = ["gpt-4o", "claude-sonnet-4", null];
+    for (var i = 0; i < models.length; i++) {
+      try {
+        var r = models[i]
+          ? await puter.ai.chat(prompt, imageURL, false, { model: models[i] })
+          : await puter.ai.chat(prompt, imageURL);
+        var t = extractText(r);
+        if (t && t.trim()) return t;
+      } catch (e) { /* try the next model */ }
+    }
+    // Fallback: OCR the picture to text, then generate from that text
+    try {
+      if (puter.ai.img2txt) {
+        var ocr = await puter.ai.img2txt(imageURL);
+        var text = (typeof ocr === "string") ? ocr : extractText(ocr);
+        if (text && text.trim().length > 15) {
+          return await askAI(prompt + "\n\nText found in the image:\n" + text.slice(0, 6000));
+        }
+      }
+    } catch (e2) { /* ignore */ }
+    throw new Error("vision unavailable");
   }
 
   function parseQuiz(text) {
@@ -409,41 +538,50 @@
       return;
     }
     var topic = (topicEl.value || "").trim();
-    if (!topic) { setStatus("Type a topic first — like “the solar system” or “World War II”.", "err"); topicEl.focus(); return; }
+    var hasImage = !!attachedImage;
+    if (!topic && !hasImage) { setStatus("Type a topic, or add a picture, to make a quiz.", "err"); topicEl.focus(); return; }
     var n = parseInt(countEl.value, 10) || 6;
 
     genBtn.disabled = true;
     var orig = genBtn.innerHTML;
     genBtn.innerHTML = "✨ Generating…";
-    setStatus("Writing your " + n + "-question " + difficulty.toLowerCase() + " quiz on “" + topic + "”… this takes a few seconds.", "");
 
-    var prompt =
-      "Create a multiple-choice quiz.\n" +
-      "Topic: " + topic + "\n" +
-      "Number of questions: " + n + "\n" +
-      "Difficulty: " + difficulty + "\n\n" +
-      "Return ONLY valid JSON and nothing else: a JSON array of exactly " + n + " objects. " +
-      'Each object must have exactly these keys: "q" (the question as a string), ' +
-      '"options" (an array of exactly 4 answer choices as strings), and ' +
-      '"correct" (the 0-based index — 0, 1, 2, or 3 — of the correct choice). ' +
-      "Make every question factually accurate and unambiguous, with exactly one correct option, appropriate for " + difficulty + " difficulty. " +
-      "Do not include explanations, markdown, or code fences — output the raw JSON array only.";
+    var quizTitle, quizTopic, prompt;
+
+    if (hasImage) {
+      setStatus("🔍 Scanning your picture and writing " + n + " " + difficulty.toLowerCase() + " questions… this can take a few seconds.", "");
+      quizTopic = topic || "your picture";
+      quizTitle = (topic ? (topic.charAt(0).toUpperCase() + topic.slice(1)) : "Picture quiz") + " — " + difficulty;
+      prompt =
+        "Look carefully at this image and create a multiple-choice quiz based on it — the objects, scene, or diagram it shows, and any text or information visible in it. " +
+        (topic ? ('Focus the quiz on this topic where relevant: "' + topic + '". ') : "") +
+        "Number of questions: " + n + ". Difficulty: " + difficulty + ".\n\n" +
+        "Return ONLY valid JSON and nothing else: a JSON array of exactly " + n + " objects. " +
+        'Each object must have exactly these keys: "q" (the question string), "options" (an array of exactly 4 answer choices as strings), and "correct" (the 0-based index 0-3 of the correct choice). ' +
+        "Base every question only on what is actually in the image. Exactly one correct option each, appropriate for " + difficulty + " difficulty. No explanations, no markdown, no code fences.";
+    } else {
+      setStatus("Writing your " + n + "-question " + difficulty.toLowerCase() + " quiz on “" + topic + "”… this takes a few seconds.", "");
+      quizTopic = topic;
+      quizTitle = topic.charAt(0).toUpperCase() + topic.slice(1) + " — " + difficulty;
+      prompt =
+        "Create a multiple-choice quiz.\nTopic: " + topic + "\nNumber of questions: " + n + "\nDifficulty: " + difficulty + "\n\n" +
+        "Return ONLY valid JSON and nothing else: a JSON array of exactly " + n + " objects. " +
+        'Each object must have exactly these keys: "q" (the question as a string), "options" (an array of exactly 4 answer choices as strings), and "correct" (the 0-based index — 0, 1, 2, or 3 — of the correct choice). ' +
+        "Make every question factually accurate and unambiguous, with exactly one correct option, appropriate for " + difficulty + " difficulty. Do not include explanations, markdown, or code fences — output the raw JSON array only.";
+    }
 
     try {
-      var text = await askAI(prompt);
+      var text = hasImage ? await askAIVision(prompt, attachedImage) : await askAI(prompt);
       var questions = parseQuiz(text);
       if (questions.length < 3) throw new Error("too few questions");
-      var quiz = {
-        title: topic.charAt(0).toUpperCase() + topic.slice(1) + " — " + difficulty,
-        topic: topic,
-        difficulty: difficulty,
-        questions: questions
-      };
+      var quiz = { title: quizTitle, topic: quizTopic, difficulty: difficulty, questions: questions };
       localStorage.setItem("spark-custom-quiz", JSON.stringify(quiz));
       setStatus("✅ Done! Opening your quiz…", "ok");
       window.location.href = "test.html?custom=1#take";
     } catch (err) {
-      setStatus("Hmm, that didn't work. Try again, or try a simpler topic. (The free AI service may be busy — a second attempt usually works.)", "err");
+      setStatus(hasImage
+        ? "Hmm, I couldn't make a quiz from that picture. Try a clearer photo, or add a topic to help. (The free AI may be busy — a second try often works.)"
+        : "Hmm, that didn't work. Try again, or try a simpler topic. (The free AI service may be busy — a second attempt usually works.)", "err");
       genBtn.disabled = false;
       genBtn.innerHTML = orig;
     }

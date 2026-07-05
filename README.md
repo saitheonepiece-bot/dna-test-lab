@@ -8,7 +8,8 @@ Open `index.html` in any web browser (double-click it, or drag it into a browser
 
 ## What's inside
 
-- **✨ AI quiz generator** — type any topic, pick 5–10 questions and Easy/Medium/Hard, and AI writes the quiz. Powered by [Puter.js](https://developer.puter.com/) so it's free for everyone with no API key.
+- **✨ AI quiz generator** — type any topic **or add a picture** (the AI scans the image — notes, a diagram, a scene — and quizzes you on it), pick 5–10 questions and Easy/Medium/Hard. Powered by [Puter.js](https://developer.puter.com/) so it's free for everyone with no API key.
+- **⏱ Timed play** — questions appear one at a time with a 15-second countdown each, then a full score + review.
 - **Ready-made science quizzes** — 🧬 Biology · ⚗️ Chemistry · 🔭 Physics, a separate test for each grade 6–9 (12 quizzes).
 - **Take mode** — answer, submit, and get an instant score with a right/wrong review.
 - **Build mode** — add, edit, or delete questions on any quiz (including AI-generated ones).
