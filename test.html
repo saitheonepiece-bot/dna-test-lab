@@ -719,10 +719,21 @@
 
   // ---------- take mode ----------
   // ---------- timed, one-question-at-a-time take mode ----------
-  var QUIZ_TIME = 15; // seconds per question
+  var QUIZ_TIME = 15; // seconds per question — set from difficulty in renderTake()
   var currentQ = 0;
   var timerTimeout = null;
   var timerInterval = null;
+
+  // Harder questions get more time to think: Easy 15s, Medium 30s, Hard 60s.
+  function timeForDifficulty(d) {
+    switch (String(d || "").toLowerCase()) {
+      case "hard": return 60;
+      case "medium": return 30;
+      case "easy": return 15;
+      default: return 20; // quizzes with no set difficulty
+    }
+  }
+  function fmtTime(sec) { return sec >= 60 ? (sec % 60 === 0 ? (sec / 60) + " min" : Math.floor(sec / 60) + "m " + (sec % 60) + "s") : sec + "s"; }
 
   function clearQuizTimers() {
     if (timerTimeout) { clearTimeout(timerTimeout); timerTimeout = null; }
@@ -734,6 +745,7 @@
     submitted = false;
     answers = {};
     currentQ = 0;
+    QUIZ_TIME = timeForDifficulty(state && state.difficulty);
     takeBody.innerHTML = "";
     if (state.questions.length === 0) {
       takeBody.innerHTML = '<div class="card empty"><div class="seq" style="font-size:30px">📝</div>This test has no questions yet.<br>Switch to <strong>Build</strong> to add some.</div>';
@@ -742,7 +754,7 @@
     var titleWrap = document.createElement("div");
     titleWrap.className = "titlebar";
     titleWrap.innerHTML = '<h2 style="flex:1;font-size:26px;color:var(--ink)">' + esc(state.title) + '</h2>' +
-      '<span class="count-pill">⏱ ' + QUIZ_TIME + 's per question</span>';
+      '<span class="count-pill">⏱ ' + fmtTime(QUIZ_TIME) + ' per question</span>';
     takeBody.appendChild(titleWrap);
 
     var stage = document.createElement("div");
