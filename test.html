@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Spark Science Lab — Take a Test</title>
+<title>Spark Quiz Lab — Take a Test</title>
 </head>
 <body>
 <style>
@@ -246,7 +246,7 @@
   <canvas id="helix" aria-hidden="true"></canvas>
   <div class="head-inner">
     <a class="home-link" href="index.html">&larr; All tests</a>
-    <p class="eyebrow" id="eyebrow">Spark Science Lab</p>
+    <p class="eyebrow" id="eyebrow">Spark Quiz Lab</p>
     <h1 id="head-title">Science Test</h1>
     <p class="sub" id="head-sub">Take the test or build your own, then get scored instantly.</p>
     <div class="switcher">
@@ -299,7 +299,7 @@
 </main>
 
 <footer>
-  Spark Science Lab · your test is saved in this browser
+  Spark Quiz Lab · your test is saved in this browser
 </footer>
 
 <script>
@@ -469,7 +469,7 @@
     document.getElementById("eyebrow").innerHTML = meta.emoji + "&nbsp; " + meta.name + " &middot; Grade " + grade;
     document.getElementById("head-title").textContent = meta.name + ": Grade " + grade + " Test";
     document.getElementById("head-sub").textContent = "A " + meta.name.toLowerCase() + " quiz on " + meta.blurb + ". Take it or build your own, then get scored instantly.";
-    document.title = meta.name + " · Grade " + grade + " — Spark Science Lab";
+    document.title = meta.name + " · Grade " + grade + " — Spark Quiz Lab";
     document.getElementById("test-title").value = state.title;
     applyTheme(meta);
     try { history.replaceState(null, "", "?subject=" + sub + "&grade=" + grade); } catch (e) {}
@@ -479,6 +479,32 @@
   function switchTest(sub, grade) {
     loadTest(sub, grade);
     if (currentTab === "take") renderTake();
+  }
+
+  // Load an AI-generated quiz stored by the home-page generator.
+  function loadCustom() {
+    var raw = null;
+    try { raw = JSON.parse(localStorage.getItem("spark-custom-quiz")); } catch (e) {}
+    if (!raw || !Array.isArray(raw.questions) || !raw.questions.length) {
+      loadTest("biology", 6);
+      return;
+    }
+    currentSubject = "custom";
+    currentGrade = null;
+    KEY = "spark-custom-quiz";
+    state = raw;
+    var meta = { name: raw.topic || "Custom Quiz", emoji: "✨", accent: "#a855f7", dark: "#7c3aed", grad: "linear-gradient(135deg,#3b0764 0%,#7c3aed 55%,#c084fc 100%)" };
+    var sw = document.querySelector(".switcher");
+    if (sw) sw.style.display = "none";
+    document.getElementById("eyebrow").innerHTML = "✨ AI-generated quiz" + (raw.difficulty ? " &middot; " + esc(raw.difficulty) : "");
+    document.getElementById("head-title").textContent = raw.title || "Custom Quiz";
+    document.getElementById("head-sub").textContent = "A quiz on “" + (raw.topic || "your topic") + "”. Take it, edit the questions, or make another.";
+    document.title = (raw.title || "Custom Quiz") + " — Spark Quiz Lab";
+    document.getElementById("test-title").value = state.title || "Custom Quiz";
+    var home = document.querySelector(".home-link");
+    if (home) home.textContent = "← Make another";
+    applyTheme(meta);
+    renderBuild();
   }
 
   // ---------- element refs ----------
@@ -715,9 +741,13 @@
   selSubject.addEventListener("change", function () { switchTest(selSubject.value, +selGrade.value); });
   selGrade.addEventListener("change", function () { switchTest(selSubject.value, +selGrade.value); });
 
-  // ---------- initial load from URL (?subject=&grade=) ----------
+  // ---------- initial load from URL (?subject=&grade= or ?custom=1) ----------
   var params = getParams();
-  loadTest(params.subject || "biology", parseInt(params.grade, 10) || 6);
+  if (params.custom === "1") {
+    loadCustom();
+  } else {
+    loadTest(params.subject || "biology", parseInt(params.grade, 10) || 6);
+  }
   // Arriving from a "Take the Test" link opens straight into take mode.
   if (window.location.hash === "#take") selectTab("take");
 
